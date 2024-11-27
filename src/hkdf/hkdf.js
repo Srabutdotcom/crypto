@@ -1,8 +1,5 @@
 //@ts-self-types="../../type/hkdf/hkdf.d.ts"
-import { Crypto } from "npm:@peculiar/webcrypto";
-import * as hkdf from "npm:/@noble/hashes/hkdf"
-import { sha256, sha384, sha512 } from "npm:/@noble/hashes/sha2"
-import { Enum } from "jsr:@tls/enum"
+import { Crypto, hkdf, sha256, sha384, sha512, Enum } from "../dep.ts";
 
 const crypto = new Crypto();
 
