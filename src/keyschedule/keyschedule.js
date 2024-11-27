@@ -1,6 +1,6 @@
+//@ts-self-types="../../type/keyschedule/keyschedule.d.ts"
 import { hkdf, Uint16 } from "../dep.ts";
 import { Struct, Constrained, sha256, sha384, sha512 } from "../dep.ts";
-
 
 export function derivedSecret(secret, label, messages = new Uint8Array){
    const hashByteLength = secret.length;
