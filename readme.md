@@ -7,11 +7,10 @@ This project implements cryptographic computation from
 
 ### Completed Work
 
-- [ ] none
+- [x] 7.1.  Key Schedule
 
 ### Pending Work
 
-- [ ] 7.1.  Key Schedule
 - [ ] 7.2.  Updating Traffic Secrets
 - [ ] 7.3.  Traffic Key Calculation
 - [ ] 7.4.  (EC)DHE Shared Secret Calculation

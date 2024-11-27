@@ -70,3 +70,19 @@ export class EarlySecret {
     */
    constructor(name: string, value: Uint8Array);
 }
+
+/**
+ * Expands a pseudorandom key (PRK) into a key of the desired length using the HKDF algorithm.
+ * 
+ * @param prk - The pseudorandom key obtained from the HKDF extract phase.
+ * @param info - Context and application-specific information (can be empty).
+ * @param hashByteLength - Desired length of the output key material (OKM) in bytes.
+ * @returns A promise that resolves to the expanded key material.
+ * 
+ * @throws Error If the desired hashByteLength is invalid or the operation fails.
+ */
+export declare function hkdfExpand(
+   prk: Uint8Array,
+   info: Uint8Array,
+   hashByteLength: number
+): Promise<Uint8Array>;
