@@ -25,7 +25,7 @@ export declare function hkdfExpandLabel(
    secret: Uint8Array,
    label: string,
    context: Uint8Array,
-   hashByteLength: number
+   Length: number
 ): Uint8Array;
 
 /**

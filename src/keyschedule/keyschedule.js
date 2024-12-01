@@ -17,11 +17,11 @@ export function derivedSecret(secret, label, messages = new Uint8Array){
    return hkdfExpandLabel(secret, label, context, hashByteLength) 
 }
 
-export function hkdfExpandLabel(secret, label, context, hashByteLength){
-   switch (hashByteLength) {
-      case 32: return hkdf.expand(sha256, secret, Uint8Array.from(HkdfLabel.of(32, label, context)), 32)
-      case 48: return hkdf.expand(sha384, secret, Uint8Array.from(HkdfLabel.of(48, label, context)), 48)
-      case 64: return hkdf.expand(sha512, secret, Uint8Array.from(HkdfLabel.of(64, label, context)), 64)
+export function hkdfExpandLabel(secret, label, context, Length){
+   switch (secret.length) {
+      case 32: return hkdf.expand(sha256, secret, Uint8Array.from(HkdfLabel.of(32, label, context)), Length)
+      case 48: return hkdf.expand(sha384, secret, Uint8Array.from(HkdfLabel.of(48, label, context)), Length)
+      case 64: return hkdf.expand(sha512, secret, Uint8Array.from(HkdfLabel.of(64, label, context)), Length)
    }
 }
 
