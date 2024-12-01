@@ -18,9 +18,9 @@ export function hkdfExtract(
  * @returns A `Promise` resolving to a `Uint8Array` containing the extracted pseudorandom key.
  */
 export function hkdfExtract256(
-   ikm?: Uint8Array,
    salt?: Uint8Array,
-): Promise<Uint8Array>;
+   ikm?: Uint8Array,
+): Uint8Array;
 
 /**
  * Computes the HKDF Extract step with SHA-384 as the hash function.
@@ -29,10 +29,9 @@ export function hkdfExtract256(
  * @returns A `Promise` resolving to a `Uint8Array` containing the extracted pseudorandom key.
  */
 export function hkdfExtract384(
-   ikm?: Uint8Array,
    salt?: Uint8Array,
-): Promise<Uint8Array>;
-
+   ikm?: Uint8Array,
+): Uint8Array;
 /**
  * Computes the HKDF Extract step with SHA-512 as the hash function.
  * @param ikm - The input key material. Defaults to a `Uint8Array` of 64 bytes.
@@ -40,9 +39,9 @@ export function hkdfExtract384(
  * @returns A `Promise` resolving to a `Uint8Array` containing the extracted pseudorandom key.
  */
 export function hkdfExtract512(
-   ikm?: Uint8Array,
    salt?: Uint8Array,
-): Promise<Uint8Array>;
+   ikm?: Uint8Array,
+): Uint8Array;
 
 /**
  * Represents an Early Secret for a specific hash function.
@@ -76,7 +75,7 @@ export class EarlySecret {
  * 
  * @param prk - The pseudorandom key obtained from the HKDF extract phase.
  * @param info - Context and application-specific information (can be empty).
- * @param hashByteLength - Desired length of the output key material (OKM) in bytes.
+ * @param hashBitLength - Desired length of the output key material (OKM) in bits.
  * @returns A promise that resolves to the expanded key material.
  * 
  * @throws Error If the desired hashByteLength is invalid or the operation fails.
@@ -84,5 +83,5 @@ export class EarlySecret {
 export declare function hkdfExpand(
    prk: Uint8Array,
    info: Uint8Array,
-   hashByteLength: number
+   hashBitLength: number
 ): Promise<Uint8Array>;

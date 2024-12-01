@@ -12,15 +12,15 @@ export async function hkdfExtract(hashBitLength=256, ikm = new Uint8Array, salt=
    return new Uint8Array(derivedKey)
 }
 
-export function hkdfExtract256(ikm = new Uint8Array(32), salt = new Uint8Array){
+export function hkdfExtract256(salt = new Uint8Array, ikm = new Uint8Array(32)){
    return hkdf.extract(sha256, ikm, salt)
 }
 
-export function hkdfExtract384(ikm = new Uint8Array(48), salt = new Uint8Array){
+export function hkdfExtract384(salt = new Uint8Array, ikm = new Uint8Array(48)){
    return hkdf.extract(sha384, ikm, salt)
 }
 
-export function hkdfExtract512(ikm = new Uint8Array(64), salt = new Uint8Array){
+export function hkdfExtract512(salt = new Uint8Array, ikm = new Uint8Array(64)){
    return hkdf.extract(sha512, ikm, salt)
 }
 
@@ -30,15 +30,17 @@ export class EarlySecret extends Enum {
    static SHA256 = new EarlySecret("SHA256", Uint8Array.of(51,173,10,28,96,126,192,59,9,230,205,152,147,104,12,226,16,173,243,0,170,31,38,96,225,178,46,16,241,112,249,42))
 } 
 
-export async function hkdfExpand(prk, info, hashByteLength){
+export async function hkdfExpand(prk, info, hashBitLength){
+   const hashByteLength = hashBitLength / 8
    let t = new Uint8Array;
    let okm = new Uint8Array;
    let i = 0;
    while(okm.length < hashByteLength){
+   //for(let i = 1; okm.length < hashByteLength; i++){
       i++;
       const counter = Uint8Array.of(i);
       const input = concatOctet(t, info, counter);
-      t = await hkdfExtract(hashByteLength, prk, input); 
+      t = await hkdfExtract(hashBitLength, input, prk); 
       okm = concatOctet(okm, t)
    }
    return okm.slice(0, hashByteLength)

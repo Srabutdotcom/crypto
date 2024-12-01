@@ -1,5 +1,5 @@
-import * as hkdf from "npm:/@noble/hashes/hkdf"
-import { sha256, sha384, sha512 } from "npm:/@noble/hashes/sha2"
+import * as hkdf from "@noble/hashes/hkdf"
+import { sha256, sha384, sha512 } from "@noble/hashes/sha2"
 import { hkdfExtract } from "../src/hkdf/hkdf.js";
 
 Deno.bench("hkdfExtract",async()=>{
