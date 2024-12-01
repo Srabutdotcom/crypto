@@ -19,17 +19,17 @@ export function derivedSecret(secret, label, messages = new Uint8Array){
 
 export function hkdfExpandLabel(secret, label, context, Length){
    switch (secret.length) {
-      case 32: return hkdf.expand(sha256, secret, Uint8Array.from(HkdfLabel.of(32, label, context)), Length)
-      case 48: return hkdf.expand(sha384, secret, Uint8Array.from(HkdfLabel.of(48, label, context)), Length)
-      case 64: return hkdf.expand(sha512, secret, Uint8Array.from(HkdfLabel.of(64, label, context)), Length)
+      case 32: return hkdf.expand(sha256, secret, Uint8Array.from(HkdfLabel.of(Length, label, context)), Length)
+      case 48: return hkdf.expand(sha384, secret, Uint8Array.from(HkdfLabel.of(Length, label, context)), Length)
+      case 64: return hkdf.expand(sha512, secret, Uint8Array.from(HkdfLabel.of(Length, label, context)), Length)
    }
 }
 
 class HkdfLabel extends Struct {
-   static of(hashByteLength, label, context){return new HkdfLabel(hashByteLength, label, context)}
-   constructor(hashByteLength, label, context){
+   static of(Length, label, context){return new HkdfLabel(Length, label, context)}
+   constructor(Length, label, context){
       super(
-         Uint16.fromValue(hashByteLength),
+         Uint16.fromValue(Length),
          Label.of(label),
          Context.of(context)
       )

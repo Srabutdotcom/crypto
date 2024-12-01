@@ -18,3 +18,4 @@ Deno.test("derived secret", ()=>{
    const derived = derivedSecret(EarlySecret.SHA256.value, 'derived')
    assertEquals(test.toString(), derived.toString())
 })
+
