@@ -3,5 +3,5 @@ import { assertEquals } from "jsr:@std/assert"
 
 Deno.test("hkdfExtract256", ()=>{
    const test = hkdfExtract256();
-   assertEquals(test.toString(), EarlySecret.SHA256.value.toString())
+   assertEquals(test.toString(), EarlySecret.SHA256.toString())
 })

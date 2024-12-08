@@ -1,4 +1,4 @@
-import { HexaDecimal, hkdf, sha256, Struct } from "../src/dep.ts";
+import { HexaDecimal, hkdf, sha256 } from "../src/dep.ts";
 import { EarlySecret } from "../src/hkdf/hkdf.js";
 import { derivedSecret } from "../src/keyschedule/keyschedule.js";
 import { assertEquals } from "jsr:@std/assert"
@@ -15,7 +15,7 @@ Deno.test("derived secret", ()=>{
       32
    )
    
-   const derived = derivedSecret(EarlySecret.SHA256.value, 'derived')
+   const derived = derivedSecret(EarlySecret.SHA256, 'derived')
    assertEquals(test.toString(), derived.toString())
 })
 
