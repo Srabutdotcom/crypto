@@ -18,7 +18,7 @@ export declare function derivedSecret(
  * @param secret - The input secret.
  * @param label - A label indicating the purpose of the expansion.
  * @param context - Context information.
- * @param hashByteLength - The output hash length (32, 48, or 64 bytes).
+ * @param Length - The output hash length (32, 48, or 64 bytes).
  * @returns The expanded key.
  */
 export declare function hkdfExpandLabel(
