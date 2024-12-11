@@ -7,7 +7,7 @@ export function derivedSecret(secret, label, messages = new Uint8Array){
    let hash = undefined
    switch (hashByteLength) {
       case 32: hash = sha256; break;
-      case 48: hash = sha256; break;
+      case 48: hash = sha384; break;
    }
    const context = hash
       .create()
@@ -17,7 +17,7 @@ export function derivedSecret(secret, label, messages = new Uint8Array){
 }
 
 export function hkdfExpandLabel(secret, label, context, Length){
-   switch (Length) {
+   switch (secret.length) {
       case 32: return hkdf.expand(sha256, secret, Uint8Array.from(HkdfLabel.of(Length, label, context)), Length)
       case 48: return hkdf.expand(sha384, secret, Uint8Array.from(HkdfLabel.of(Length, label, context)), Length)
    }
