@@ -79,7 +79,7 @@ export class Aead { //*AESGCM
    async decrypt(tlsCipherText) {
       await this.importKey();
       this.algo.additionalData = tlsCipherText.header;
-      const output = await self.crypto.subtle.decrypt(this.algo, this.cryptoKey, tlsCipherText.encryptedRecord);
+      const output = await self.crypto.subtle.decrypt(this.algo, this.cryptoKey, tlsCipherText.encrypted_record);
       return new Uint8Array(output);
    }
 }
