@@ -1,4 +1,6 @@
 //@ts-self-types="../../type/aead/aead.d.ts"
+import { TLSCiphertext } from "../dep.ts"
+
 export class Aead { //*AESGCM
 
    /**
@@ -67,7 +69,7 @@ export class Aead { //*AESGCM
       }
       const output = await self.crypto.subtle.encrypt(this.algo, this.cryptoKey, tlsInnerPlaintext);
       this.buildIV()
-      return TLSCiphertext.a(new Uint8Array(output));
+      return new TLSCiphertext(new Uint8Array(output));
    }
    /**
     * 

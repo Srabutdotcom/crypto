@@ -5,3 +5,5 @@ Deno.test("hkdfExtract256", ()=>{
    const test = hkdfExtract256();
    assertEquals(test.toString(), EarlySecret.SHA256.toString())
 })
+
+const n = null;

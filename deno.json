@@ -1,6 +1,6 @@
 {
   "name": "@tls/crypto",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "exports": "./src/mod.ts",
   "publish": {
     "exclude": ["dist/"]
@@ -13,10 +13,11 @@
     }
   },
   "imports": {
+    "@noble/curves": "npm:@noble/curves@^1.7.0",
     "@noble/hashes": "npm:@noble/hashes@^1.6.1",
     "@peculiar/webcrypto": "npm:@peculiar/webcrypto@^1.5.0",
     "@std/assert": "jsr:@std/assert@^1.0.2",
-    "@tls/enum": "jsr:@tls/enum@^0.4.0",
+    "@tls/enum": "jsr:@tls/enum@^0.4.1",
     "@tls/struct": "jsr:@tls/struct@^0.3.2"
   }
 }

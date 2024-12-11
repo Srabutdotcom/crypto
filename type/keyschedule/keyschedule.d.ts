@@ -71,3 +71,27 @@ declare class Context extends Constrained {
 
    constructor(context: (Uint8Array|number));
 }
+
+/**
+ * Represents derived secrets for different hash functions in TLS 1.3.
+ */
+export class DerivedSecret {
+   /**
+    * The derived secret for SHA-256 (32 bytes).
+    */
+   static SHA256: Uint8Array 
+
+   /**
+    * The derived secret for SHA-384 (48 bytes).
+    */
+   static SHA384: Uint8Array 
+}
+
+/**
+* Derives the "finished" key in the TLS 1.3 handshake.
+*
+* @param {Uint8Array} serverHS_secret - The server handshake secret.
+* @param {number} [hashLength] - The length of the hash output (default is the length of the serverHS_secret).
+* @returns {Uint8Array} - The derived "finished" key.
+*/
+export function finishedKey(serverHS_secret: Uint8Array, hashLength?: number): Uint8Array;

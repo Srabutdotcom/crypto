@@ -32,26 +32,11 @@ export function hkdfExtract384(
    salt?: Uint8Array,
    ikm?: Uint8Array,
 ): Uint8Array;
-/**
- * Computes the HKDF Extract step with SHA-512 as the hash function.
- * @param ikm - The input key material. Defaults to a `Uint8Array` of 64 bytes.
- * @param salt - The salt value. Defaults to an empty `Uint8Array`.
- * @returns A `Promise` resolving to a `Uint8Array` containing the extracted pseudorandom key.
- */
-export function hkdfExtract512(
-   salt?: Uint8Array,
-   ikm?: Uint8Array,
-): Uint8Array;
 
 /**
  * Represents an Early Secret for a specific hash function.
  */
 export class EarlySecret {
-   /**
-    * The Early Secret for SHA-512.
-    */
-   static SHA512: EarlySecret;
-
    /**
     * The Early Secret for SHA-384.
     */
