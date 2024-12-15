@@ -2,7 +2,7 @@
 import { hkdf, Uint16 } from "../dep.ts";
 import { Struct, Constrained, sha256, sha384 } from "../dep.ts";
 
-export function derivedSecret(secret, label, messages = new Uint8Array){
+export function derivedSecret(secret, label, messages = new Uint8Array) {
    const hashByteLength = secret.length;
    let hash = undefined
    switch (hashByteLength) {
@@ -13,19 +13,19 @@ export function derivedSecret(secret, label, messages = new Uint8Array){
       .create()
       .update(Uint8Array.from(messages))
       .digest()
-   return hkdfExpandLabel(secret, label, context, hashByteLength) 
+   return hkdfExpandLabel(secret, label, context, hashByteLength)
 }
 
-export function hkdfExpandLabel(secret, label, context, Length){
+export function hkdfExpandLabel(secret, label, context, Length) {
    switch (secret.length) {
-      case 32: return hkdf.expand(sha256, secret, Uint8Array.from(HkdfLabel.of(Length, label, context)), Length)
-      case 48: return hkdf.expand(sha384, secret, Uint8Array.from(HkdfLabel.of(Length, label, context)), Length)
+      case 32: return hkdf.expand(sha256, secret, Uint8Array.from(HkdfLabel.of(Length ?? 32, label, context)), Length ?? 32)
+      case 48: return hkdf.expand(sha384, secret, Uint8Array.from(HkdfLabel.of(Length ?? 32, label, context)), Length ?? 32)
    }
 }
 
 class HkdfLabel extends Struct {
-   static of(Length, label, context){return new HkdfLabel(Length, label, context)}
-   constructor(Length, label, context){
+   static of(Length, label, context) { return new HkdfLabel(Length, label, context) }
+   constructor(Length, label, context) {
       super(
          Uint16.fromValue(Length),
          Label.of(label),
@@ -35,25 +35,25 @@ class HkdfLabel extends Struct {
 }
 
 class Label extends Constrained {
-   static of(label){ return new Label(label)}
-   constructor(label){
+   static of(label) { return new Label(label) }
+   constructor(label) {
       super(7, 255, new TextEncoder().encode(`tls13 ${label}`))
    }
 }
 
 class Context extends Constrained {
-   static of(context){ return new Context(context)}
-   constructor(context){
+   static of(context) { return new Context(context) }
+   constructor(context) {
       super(0, 255, context)
    }
 }
 
 export class DerivedSecret {
-   static SHA256 = Uint8Array.of(111,38,21,161,8,199,2,197,103,143,84,252,157,186,182,151,22,192,118,24,156,72,37,12,235,234,195,87,108,54,17,186);
-   static SHA384 =  Uint8Array.of(115,123,52,69,75,237,139,131,80,43,54,16,80,167,99,154,146,146,198,59,140,7,137,209,122,146,113,108,234,67,141,183,30,88,208,165,51,240,17,149,152,60,244,110,133,34,78,95);
+   static SHA256 = Uint8Array.of(111, 38, 21, 161, 8, 199, 2, 197, 103, 143, 84, 252, 157, 186, 182, 151, 22, 192, 118, 24, 156, 72, 37, 12, 235, 234, 195, 87, 108, 54, 17, 186);
+   static SHA384 = Uint8Array.of(115, 123, 52, 69, 75, 237, 139, 131, 80, 43, 54, 16, 80, 167, 99, 154, 146, 146, 198, 59, 140, 7, 137, 209, 122, 146, 113, 108, 234, 67, 141, 183, 30, 88, 208, 165, 51, 240, 17, 149, 152, 60, 244, 110, 133, 34, 78, 95);
 }
 
-export function finishedKey(serverHS_secret, hashLength){
+export function finishedKey(serverHS_secret, hashLength) {
    return hkdfExpandLabel(serverHS_secret, 'finished', new Uint8Array, hashLength ?? serverHS_secret.length);
 }
 

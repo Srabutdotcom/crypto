@@ -6,11 +6,11 @@ import { hkdfExpand } from "../src/hkdf/hkdf.js"
 const rnd = crypto.getRandomValues(new Uint8Array(32))
 
 Deno.bench("hkdf.expand",()=>{
-   const test = hkdf.expand(sha256,EarlySecret.SHA256.value,rnd,32)
+   const test = hkdf.expand(sha256,EarlySecret.SHA256,rnd,32)
 })
 
 Deno.bench("hkdfExpand",async()=>{
-   const test2 = await hkdfExpand(EarlySecret.SHA256.value,rnd, 256)
+   const test2 = await hkdfExpand(EarlySecret.SHA256,rnd, 256)
 })
 
 
