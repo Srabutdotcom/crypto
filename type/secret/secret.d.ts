@@ -60,7 +60,13 @@ export class Secret {
     * @param namedGroup The named group used in key exchange.
     * @param peerPublicKey The public key of the peer (optional).
     */
-   constructor(cipher: string, namedGroup: NamedGroup, peerPublicKey?: Uint8Array);
+   constructor(
+      cipher: string,
+      namedGroup: NamedGroup,
+      privateKey?: Uint8Array,
+      publicKey?: Uint8Array,
+      peerPublicKey?: Uint8Array,
+   );
 
    /**
     * Derives the handshake secret using the shared key.
@@ -82,7 +88,10 @@ export class Secret {
     * @param serverHelloMsg The server's hello message.
     * @returns The client handshake traffic key.
     */
-   getClientHandShakeTrafficKey(clientHelloMsg: Uint8Array, serverHelloMsg: Uint8Array): Uint8Array;
+   getClientHandShakeTrafficKey(
+      clientHelloMsg: Uint8Array,
+      serverHelloMsg: Uint8Array,
+   ): Uint8Array;
 
    /**
     * Derives the server handshake traffic key.
@@ -90,7 +99,10 @@ export class Secret {
     * @param serverHelloMsg The server's hello message.
     * @returns The server handshake traffic key.
     */
-   getServerHandShakeTrafficKey(clientHelloMsg: Uint8Array, serverHelloMsg: Uint8Array): Uint8Array;
+   getServerHandShakeTrafficKey(
+      clientHelloMsg: Uint8Array,
+      serverHelloMsg: Uint8Array,
+   ): Uint8Array;
 
    /**
     * Derives the master key from the handshake key.
@@ -119,4 +131,14 @@ export class Secret {
     * @returns The finished client key.
     */
    getFinishedClientKey(): Uint8Array;
+
+   /**
+    * Sets privateKey to this secret class
+    */
+   set privateKey(key: Uint8Array);
+
+   /**
+    * Sets publicKey to this secret class
+    */
+   set publicKey(key: Uint8Array);
 }
