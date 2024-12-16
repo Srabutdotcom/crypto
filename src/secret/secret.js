@@ -4,6 +4,7 @@ import { hkdfExtract256, hkdfExtract384 } from "../hkdf/hkdf.js";
 import { derivedSecret } from "../keyschedule/keyschedule.js";
 import { hkdfExpandLabel } from "../keyschedule/keyschedule.js";
 import { Aead } from "../aead/aead.js"
+import { Struct } from "../dep.ts";
 
 export class Secret {
    keyLength;
