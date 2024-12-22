@@ -4,7 +4,7 @@ import { hkdfExtract256, hkdfExtract384 } from "../hkdf/hkdf.js";
 import { derivedSecret } from "../keyschedule/keyschedule.js";
 import { hkdfExpandLabel } from "../keyschedule/keyschedule.js";
 import { Aead } from "../aead/aead.js"
-import { Struct, HexaDecimal, SignatureScheme, finished } from "../dep.ts";
+import { /* Struct, HexaDecimal, SignatureScheme, */ finished } from "../dep.ts";
 
 export class Secret {
    keyLength;
@@ -119,6 +119,7 @@ export class Secret {
       this.transcript.insert(finishedClientMsg);
 
       this.resMaster ||= derivedSecret(this.masterKey, "res master", this.transcript.byte);
+      this.resumption ||= hkdfExpandLabel(this.resMaster, 'resumption', Uint8Array.of(0,0));
 
    }
 }

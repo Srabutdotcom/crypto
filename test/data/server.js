@@ -127,3 +127,8 @@ export const finishedClientMsg = HexaDecimal.fromString(
    `14 00 00 20 a8 ec 43 6d 67 76 34 ae 52 5a
    c1 fc eb e1 1a 03 9e c1 76 94 fa c6 e9 85 27 b6 42 f2 ed d5 ce
    61`).byte
+
+export const resumption = HexaDecimal.fromString(
+   `4e cd 0e b6 ec 3b 4d 87 f5 d6 02 8f 92 2c
+   a4 c5 85 1a 27 7f d4 13 11 c9 e6 2d 2c 94 92 e1 c4 f3`
+).byte

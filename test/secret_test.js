@@ -5,7 +5,7 @@ import { clientPublicKey, clientHelloMsg } from "./data/client.js";
 import { handshakeKey, masterKey, keyHSServer, ivHSServer, finishedKeyServer } from "./data/server.js";
 import { encryptedExtensionsMsg, certificateMsg, rsaPrivateKey, certificateVerifyMsg, finishedMsg, finishedClientMsg } from "./data/server.js";
 import { expMasterKey, keyAPServer, ivAPServer, keyHSClient, ivHSClient } from "./data/server.js";
-import { keyAPClient, ivAPClient, finishedKeyClient, resMaster } from "./data/server.js";
+import { keyAPClient, ivAPClient, finishedKeyClient, resMaster, resumption } from "./data/server.js";
 import { assertEquals } from "jsr:@std/assert"
 
 const secret = new Secret(Cipher.AES_128_GCM_SHA256, NamedGroup.X25519, serverPrivateKey, serverPublicKey, clientPublicKey);
@@ -28,5 +28,6 @@ assertEquals(secret.ivHSClient, ivHSClient, "iv handshake client");
 assertEquals(secret.keyAPClient, keyAPClient, "key application client");
 assertEquals(secret.ivAPClient, ivAPClient, "iv application client");
 assertEquals(secret.resMaster, resMaster, "res master key");
+assertEquals(secret.resumption, resumption, "resumption key");
 
 const _n = null;
