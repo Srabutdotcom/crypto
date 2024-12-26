@@ -1,12 +1,18 @@
 //@ts-self-types="../../type/aead/aead.d.ts"
-import { TLSCiphertext } from "../dep.ts"
+import { TLSCiphertext/* , Crypto */ } from "../dep.ts"
+import { AES } from "../dep.ts"
+import { GCM } from "../dep.ts"
+import { siv } from "../dep.ts"
+
+//const crypto = new Crypto();
 
 export class Aead { //*AESGCM
 
    /**
     * @type {number} sequential number - positive integer
     */
-   seq = 0
+   seqEnc = 0
+   seqDec = 0
 
    /**
     * @type {Uint8Array} key - octet
@@ -16,17 +22,8 @@ export class Aead { //*AESGCM
    /**
     * @type {Uint8Array} iv - Uint8Array
     */
-   iv
-
-   /**
-    * @type {{ name: "AES-GCM"; iv: Uint8Array; additionalData: Uint8Array; }} Algorithm 
-    */
-   algo = {
-      name: "AES-GCM",
-      iv: new Uint8Array,
-      additionalData: new Uint8Array,
-      //tagLength: 128 //*by default is 128
-   }
+   ivEnc
+   ivDec
 
    /**
     * @type {CryptoKey} key - CryptoKey
@@ -39,18 +36,25 @@ export class Aead { //*AESGCM
     */
    constructor(key, iv) {
       this.key = key;
-      this.iv = iv;
-      this.algo.iv = iv
+      this.ivEnc = Uint8Array.from(iv);
+      this.ivDec = Uint8Array.from(iv);
+      this.gcm = new GCM(new AES(key));//const cipher = new AES(key.byte)
    }
-   buildIV() {
+   buildIVEnc() {
+      this.seqEnc++;
       for (let i = 0; i < 8; i++) {
-         this.iv[this.iv.length - 1 - i] ^= ((this.seq >> (i * 8)) & 0xFF);
+         this.ivEnc[this.ivEnc.length - 1 - i] ^= ((this.seqEnc >> (i * 8)) & 0xFF);
       }
-      this.seq++;
+   }
+   buildIVDec() {
+      this.seqDec++;
+      for (let i = 0; i < 8; i++) {
+         this.ivDec[this.ivDec.length - 1 - i] ^= ((this.seqDec >> (i * 8)) & 0xFF);
+      }
    }
    async importKey() {
       if (this.cryptoKey) return
-      this.cryptoKey = await self.crypto.subtle.importKey('raw', this.key, { name: 'AES-GCM' }, true, ['encrypt', 'decrypt'])
+      this.cryptoKey = await crypto.subtle.importKey('raw', this.key, { name: 'AES-GCM' }, true, ['encrypt', 'decrypt'])
    }
    /**
     * 
@@ -58,17 +62,15 @@ export class Aead { //*AESGCM
     * @returns {TLSCiphertext}
     */
    async encrypt(tlsInnerPlaintext) {
-      const lengthOf = tlsInnerPlaintext.length + this.key.length;
-      const header = Uint8Array.of(tlsInnerPlaintext.at(-1), 3, 3, Math.trunc(lengthOf / 256), lengthOf % 256)
+      const _header = header(tlsInnerPlaintext, this.key.length);
       await this.importKey();
-      this.algo = {
+      const output = await crypto.subtle.encrypt({
          name: "AES-GCM",
-         iv: this.iv,
-         additionalData: header, // as additional data
+         iv: this.ivEnc,
+         additionalData: _header, // as additional data
          //tagLength: 128 //*by default is 128
-      }
-      const output = await self.crypto.subtle.encrypt(this.algo, this.cryptoKey, tlsInnerPlaintext);
-      this.buildIV()
+      }, this.cryptoKey, tlsInnerPlaintext);
+      this.buildIVEnc()
       return new TLSCiphertext(new Uint8Array(output));
    }
    /**
@@ -78,8 +80,47 @@ export class Aead { //*AESGCM
     */
    async decrypt(tlsCipherText) {
       await this.importKey();
-      this.algo.additionalData = tlsCipherText.header;
-      const output = await self.crypto.subtle.decrypt(this.algo, this.cryptoKey, tlsCipherText.encrypted_record);
+      const output = await crypto.subtle.decrypt({
+         name: "AES-GCM",
+         iv: this.ivDec,
+         additionalData: tlsCipherText.header, // as additional data
+         //tagLength: 128 //*by default is 128
+      }, this.cryptoKey, tlsCipherText.encrypted_record);
+      this.buildIVDec()
       return new Uint8Array(output);
    }
+
+   seal(tlsInnerPlaintext){
+      const _header = header(tlsInnerPlaintext, this.key.length);
+      const sealed = this.gcm.seal(this.ivEnc, tlsInnerPlaintext, _header);
+      this.buildIVEnc();
+      return new TLSCiphertext(sealed);
+   }
+
+   open(tlsCipherText){
+      const opened = this.gcm.open(this.ivDec, tlsCipherText.encrypted_record, tlsCipherText.header);
+      this.buildIVDec();
+      return opened;
+   }
+
+   sivSeal(tlsInnerPlaintext){
+      const _header = header(tlsInnerPlaintext, this.key.length);
+      const aes = siv(this.key, this.ivEnc, _header)
+      const sealed = aes.encrypt(tlsInnerPlaintext);
+      this.buildIVEnc();
+      return new TLSCiphertext(sealed);
+   }
+
+   sivOpen(tlsCipherText){
+      const aes = siv(this.key, this.ivDec, tlsCipherText.header)
+      const opened = aes.decrypt(tlsCipherText.encrypted_record)
+      this.buildIVDec();
+      return opened;
+   }
+}
+
+function header(tlsInnerPlaintext, keyLength){
+   const lengthOf = tlsInnerPlaintext.length + keyLength;
+   // header always 23 - application
+   return Uint8Array.of(23, 3, 3, Math.trunc(lengthOf / 256), lengthOf % 256);
 }

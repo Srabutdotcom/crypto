@@ -1,8 +1,8 @@
 //@ts-self-types="../../type/hkdf/hkdf.d.ts"
-import { Crypto, hkdf, sha256, sha384 } from "../dep.ts";
-import { concatOctet } from "../dep.ts";
+import { /* Crypto,  */hkdf, sha256, sha384 } from "../dep.ts";
+import { safeuint8array } from "../dep.ts";
 
-const crypto = new Crypto();
+//const crypto = new Crypto();
 
 export async function hkdfExtract(hashBitLength=256, ikm = new Uint8Array, salt= new Uint8Array){
    if(salt.length==0)salt = new Uint8Array(hashBitLength/8);
@@ -37,9 +37,9 @@ export async function hkdfExpand(prk, info, hashBitLength){
    //for(let i = 1; okm.length < hashByteLength; i++){
       i++;
       const counter = Uint8Array.of(i);
-      const input = concatOctet(t, info, counter);
+      const input = safeuint8array(t, info, counter);
       t = await hkdfExtract(hashBitLength, input, prk); 
-      okm = concatOctet(okm, t)
+      okm = safeuint8array(okm, t)
    }
    return okm.slice(0, hashByteLength)
 }

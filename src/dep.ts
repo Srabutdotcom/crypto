@@ -8,3 +8,6 @@ export { x448 } from '@noble/curves/ed448';
 export { p256 } from '@noble/curves/p256';
 export { p384 } from '@noble/curves/p384';
 export { p521 } from '@noble/curves/p521';
+export { AES } from "@stablelib/aes";
+export { GCM } from "@stablelib/gcm"
+export { siv } from "@noble/ciphers/aes"

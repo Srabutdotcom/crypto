@@ -60,4 +60,10 @@ Deno.bench("AES-GCM using webcrypto", async () => {
    const b = new Uint8Array(open_web)
 })
 
+
+const cipher = new AES(key.byte)
+const gcm = new GCM(cipher);
+
+const sealed = gcm.seal(nonce.byte, plaintext.byte, ad.byte);
+const open = gcm.open(nonce.byte, result.byte, ad.byte)
 const n = null;

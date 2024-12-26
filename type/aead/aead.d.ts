@@ -1,77 +1,114 @@
-import { TLSInnerPlaintext, TLSCiphertext } from "../../src/dep.ts"
+import { TLSInnerPlaintext, TLSCiphertext } from "@tls/enum"
+
 /**
- * Class representing an AES-GCM AEAD encryption/decryption handler.
+ * Represents an AEAD (Authenticated Encryption with Associated Data) using AES-GCM.
  */
 export class Aead {
-   /**
-    * Sequential number used for building IV.
-    * @type {number}
-    */
-   seq: number;
- 
-   /**
-    * Encryption key as a Uint8Array.
-    * @type {Uint8Array}
-    */
-   key: Uint8Array;
- 
-   /**
-    * Initialization vector (IV) as a Uint8Array.
-    * @type {Uint8Array}
-    */
-   iv: Uint8Array;
- 
-   /**
-    * AES-GCM algorithm configuration.
-    * @type {{ name: "AES-GCM"; iv: Uint8Array; additionalData: Uint8Array; }}
-    */
-   algo: {
-     name: "AES-GCM";
-     iv: Uint8Array;
-     additionalData: Uint8Array;
-   };
- 
-   /**
-    * CryptoKey instance for AES-GCM operations.
-    * @type {CryptoKey}
-    */
-   cryptoKey: CryptoKey | undefined;
- 
-   /**
-    * Constructs an Aead instance.
-    *
-    * @param {Uint8Array} key - Encryption key.
-    * @param {Uint8Array} iv - Initialization vector (IV).
-    */
-   constructor(key: Uint8Array, iv: Uint8Array);
- 
-   /**
-    * Builds the IV by XORing with the sequential number.
-    */
-   buildIV(): void;
- 
-   /**
-    * Imports the encryption key as a CryptoKey.
-    * Ensures the key is imported only once.
-    * 
-    * @returns {Promise<void>}
-    */
-   importKey(): Promise<void>;
- 
-   /**
-    * Encrypts a `TLSInnerPlaintext` instance using AES-GCM.
-    *
-    * @param {TLSInnerPlaintext} tlsInnerPlaintext - Data to be encrypted.
-    * @returns {Promise<TLSCiphertext>} A promise resolving to a `TLSCiphertext` instance.
-    */
-   encrypt(tlsInnerPlaintext: TLSInnerPlaintext): Promise<TLSCiphertext>;
- 
-   /**
-    * Decrypts a `TLSCiphertext` instance using AES-GCM.
-    *
-    * @param {TLSCiphertext} tlsCipherText - Data to be decrypted.
-    * @returns {Promise<Uint8Array>} A promise resolving to the decrypted data as a Uint8Array.
-    */
-   decrypt(tlsCipherText: TLSCiphertext): Promise<Uint8Array>;
- }
- 
+  /**
+   * Sequential number for encryption.
+   * @type {number}
+   */
+  seqEnc: number;
+
+  /**
+   * Sequential number for decryption.
+   * @type {number}
+   */
+  seqDec: number;
+
+  /**
+   * Encryption/Decryption key.
+   * @type {Uint8Array}
+   */
+  key: Uint8Array;
+
+  /**
+   * Initialization vector for encryption.
+   * @type {Uint8Array}
+   */
+  ivEnc: Uint8Array;
+
+  /**
+   * Initialization vector for decryption.
+   * @type {Uint8Array}
+   */
+  ivDec: Uint8Array;
+
+  /**
+   * CryptoKey for AES-GCM operations.
+   * @type {CryptoKey}
+   */
+  cryptoKey: CryptoKey;
+
+  /**
+   * Creates an instance of the `Aead` class.
+   * @param {Uint8Array} key - The encryption/decryption key.
+   * @param {Uint8Array} iv - The initialization vector.
+   */
+  constructor(key: Uint8Array, iv: Uint8Array);
+
+  /**
+   * Builds the next encryption initialization vector.
+   */
+  buildIVEnc(): void;
+
+  /**
+   * Builds the next decryption initialization vector.
+   */
+  buildIVDec(): void;
+
+  /**
+   * Imports the AES-GCM key for cryptographic operations.
+   */
+  importKey(): Promise<void>;
+
+  /**
+   * Encrypts the given plaintext using AES-GCM.
+   * @param {TLSInnerPlaintext} tlsInnerPlaintext - The plaintext data to encrypt.
+   * @returns {Promise<TLSCiphertext>} The encrypted ciphertext.
+   */
+  encrypt(tlsInnerPlaintext: TLSInnerPlaintext): Promise<TLSCiphertext>;
+
+  /**
+   * Decrypts the given ciphertext using AES-GCM.
+   * @param {TLSCiphertext} tlsCipherText - The ciphertext to decrypt.
+   * @returns {Promise<Uint8Array>} The decrypted plaintext.
+   */
+  decrypt(tlsCipherText: TLSCiphertext): Promise<Uint8Array>;
+
+  /**
+   * Encrypts the given plaintext using a custom AES-GCM implementation.
+   * @param {TLSInnerPlaintext} tlsInnerPlaintext - The plaintext data to encrypt.
+   * @returns {TLSCiphertext} The encrypted ciphertext.
+   */
+  seal(tlsInnerPlaintext: TLSInnerPlaintext): TLSCiphertext;
+
+  /**
+   * Decrypts the given ciphertext using a custom AES-GCM implementation.
+   * @param {TLSCiphertext} tlsCipherText - The ciphertext to decrypt.
+   * @returns {Uint8Array} The decrypted plaintext.
+   */
+  open(tlsCipherText: TLSCiphertext): Uint8Array;
+
+  /**
+   * Encrypts the given plaintext using AES-SIV (Synthetic Initialization Vector).
+   * @param {TLSInnerPlaintext} tlsInnerPlaintext - The plaintext data to encrypt.
+   * @returns {TLSCiphertext} The encrypted ciphertext.
+   */
+  sivSeal(tlsInnerPlaintext: TLSInnerPlaintext): TLSCiphertext;
+
+  /**
+   * Decrypts the given ciphertext using AES-SIV.
+   * @param {TLSCiphertext} tlsCipherText - The ciphertext to decrypt.
+   * @returns {Uint8Array} The decrypted plaintext.
+   */
+  sivOpen(tlsCipherText: TLSCiphertext): Uint8Array;
+}
+
+/**
+* Generates a header for the AEAD encryption process.
+* @param {TLSInnerPlaintext} tlsInnerPlaintext - The plaintext data to encrypt.
+* @param {number} keyLength - The length of the encryption key.
+* @returns {Uint8Array} The generated header.
+*/
+export function header(tlsInnerPlaintext: TLSInnerPlaintext, keyLength: number): Uint8Array;
