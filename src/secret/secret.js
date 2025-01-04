@@ -4,7 +4,7 @@ import { hkdfExtract256, hkdfExtract384 } from "../hkdf/hkdf.js";
 import { derivedSecret } from "../keyschedule/keyschedule.js";
 import { hkdfExpandLabel } from "../keyschedule/keyschedule.js";
 import { Aead } from "../aead/aead.js"
-import { /* Struct, HexaDecimal, SignatureScheme, */ finished } from "../dep.ts";
+import { sha256, sha384, safeuint8array, Finished,/* Struct, HexaDecimal, SignatureScheme,  finished */} from "../dep.ts";
 
 export class Secret {
    keyLength;
@@ -144,6 +144,44 @@ class TranscriptMsg extends Set {
          this.byte = Uint8Array.from(Array.from(this.byte).concat(Array.from(msg)))
       }
    }
+}
+
+async function finished(finishedKey, sha = 256, ...messages) {
+   //const finishedKey = hkdfExpandLabel(serverHS_secret, 'finished', new Uint8Array, 32);
+   const finishedKeyCrypto = await crypto.subtle.importKey(
+      "raw",
+      finishedKey,
+      {
+         name: "HMAC",
+         hash: { name: `SHA-${sha}` },
+      },
+      true,
+      ["sign", "verify"]
+   );
+
+   const hash = sha == 256 ? sha256.create() :
+      sha == 384 ? sha384.create() : sha256.create();
+
+   //const messagesStruct = Struct.createFrom(...messages);
+
+   const transcriptHash = hash
+      .update(safeuint8array(...messages))
+      .digest();
+
+   const verify_data = await crypto.subtle.sign(
+      { name: "HMAC" },
+      finishedKeyCrypto,
+      transcriptHash
+   )
+
+   /* const _test_verify_data = await crypto.subtle.verify(
+      { name: "HMAC" },
+      finishedKeyCrypto,
+      verify_data,
+      transcriptHash
+   ) */
+   //verify_data.transcriptHash = transcriptHash;
+   return new Finished(verify_data);
 }
 
 const isUint8Array = (data) => data instanceof Uint8Array
