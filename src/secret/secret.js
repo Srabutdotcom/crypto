@@ -3,6 +3,7 @@ import { DerivedSecret } from "../keyschedule/keyschedule.js";
 import { hkdfExtract256, hkdfExtract384 } from "../hkdf/hkdf.js";
 import { derivedSecret } from "../keyschedule/keyschedule.js";
 import { hkdfExpandLabel } from "../keyschedule/keyschedule.js";
+import { TranscriptMsg } from "./transcript.js";
 import { Aead } from "../aead/aead.js"
 import { sha256, sha384, safeuint8array, Finished,/* Struct, HexaDecimal, SignatureScheme,  finished */} from "../dep.ts";
 
@@ -29,6 +30,7 @@ export class Secret {
    apKeyServer;
    expMaster;
    resMaster;
+   resumption;
    keyAPClient;
    keyAPServer;
    ivAPClient;
@@ -119,30 +121,10 @@ export class Secret {
       this.transcript.insert(finishedClientMsg);
 
       this.resMaster ||= derivedSecret(this.masterKey, "res master", this.transcript.byte);
-      this.resumption ||= hkdfExpandLabel(this.resMaster, 'resumption', Uint8Array.of(0,0));
-
+      
    }
-}
-
-class TranscriptMsg extends Set {
-   //items = new Set
-   byte
-   constructor(...msgs) {
-      let arr = [];
-      for (const msg of msgs) {
-         if (!isUint8Array(msg)) throw TypeError(`Expected Uint8Array`)
-         //this.items.add(Array.from(msg));
-         arr = arr.concat(Array.from(msg))
-      }
-      super([...msgs])
-      this.byte = Uint8Array.from(arr)
-   }
-   insert(...msgs) {
-      for (const msg of msgs) {
-         if (!isUint8Array(msg)) throw TypeError(`Expected Uint8Array`);
-         this.add(msg);
-         this.byte = Uint8Array.from(Array.from(this.byte).concat(Array.from(msg)))
-      }
+   getResumption(ticketNonce = Uint8Array.of(0,0)){
+      this.resumption ||= hkdfExpandLabel(this.resMaster, 'resumption', ticketNonce);
    }
 }
 
@@ -184,7 +166,4 @@ async function finished(finishedKey, sha = 256, ...messages) {
    return new Finished(verify_data);
 }
 
-const isUint8Array = (data) => data instanceof Uint8Array
-//TODO - signature - certificateVerify
-//TODO - verify_data - finished
 

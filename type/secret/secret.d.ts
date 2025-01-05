@@ -1,144 +1,113 @@
 import { Aead } from "../../src/aead/aead.js";
-import { NamedGroup } from "../../src/dep.ts";
+import { TranscriptMsg } from "../../src/secret/transcript.js";
 /**
- * Represents the derived secrets used in the TLS handshake process.
+ * Represents the cryptographic secrets used in a TLS handshake.
  */
 export class Secret {
-   /**
-    * Length of the cryptographic key in bytes.
-    */
    keyLength: number;
-
-   /**
-    * Length of the hash digest in bytes.
-    */
    digestLength: number;
-
+   namedGroup: any;
+   derivedKey: any;
+   sharedKey: Uint8Array | undefined;
+   hsKey: Uint8Array | undefined;
+   transcript: TranscriptMsg;
+   masterKey: Uint8Array | undefined;
+   hsTrafficKeyClient: Uint8Array | undefined;
+   hsTrafficKeyServer: Uint8Array | undefined;
+   keyHSServer: Uint8Array | undefined;
+   ivHSServer: Uint8Array | undefined;
+   keyHSClient: Uint8Array | undefined;
+   ivHSClient: Uint8Array | undefined;
+   finishedKeyServer: Uint8Array | undefined;
+   finishedKeyClient: Uint8Array | undefined;
+   aeadHSServer: Aead | undefined;
+   aeadHSClient: Aead | undefined;
+   apKeyClient: Uint8Array | undefined;
+   apKeyServer: Uint8Array | undefined;
+   expMaster: Uint8Array | undefined;
+   resMaster: Uint8Array | undefined;
+   resumption: Uint8Array | undefined;
+   keyAPClient: Uint8Array | undefined;
+   keyAPServer: Uint8Array | undefined;
+   ivAPClient: Uint8Array | undefined;
+   ivAPServer: Uint8Array | undefined;
+   aeadAPServer: Aead | undefined;
+   aeadAPClient: Aead | undefined;
+ 
    /**
-    * The named group used in the key exchange (e.g., P-256, P-384).
+    * Creates an instance of the `Secret` class.
+    * @param cipher - The cipher suite being used.
+    * @param namedGroup - The named group for key exchange.
+    * @param privateKey - The private key (optional).
+    * @param publicKey - The public key (optional).
+    * @param peerPublicKey - The peer's public key (optional).
     */
-   namedGroup: NamedGroup;
-
+   constructor(cipher: string, namedGroup: any, privateKey?: Uint8Array, publicKey?: Uint8Array, peerPublicKey?: Uint8Array);
+ 
    /**
-    * The derived key based on the hash function.
+    * Computes the handshake secret.
+    * @param sharedKey - The shared key from the key exchange.
+    * @returns The handshake secret as a `Uint8Array`.
     */
-   derivedKey: Uint8Array;
-
+   getHSSecret(sharedKey: Uint8Array): Uint8Array;
+ 
    /**
-    * The shared secret generated during the key exchange.
-    */
-   sharedKey?: Uint8Array;
-
-   /**
-    * The handshake secret derived from the shared key.
-    */
-   handshakeKey?: Uint8Array;
-
-   /**
-    * Combined client and server messages for transcript hash calculation.
-    */
-   transcriptMsg?: any;
-
-   /**
-    * The master secret derived during the handshake process.
-    */
-   masterKey?: Uint8Array;
-
-   /**
-    * The AEAD writer instance for secure communication.
-    */
-   aeadWriter?: Aead;
-
-   /**
-    * The AEAD reader instance for secure communication.
-    */
-   aeadReader?: Aead;
-
-   /**
-    * Creates a new Secret instance.
-    * @param cipher The cipher suite used (e.g., 'AES_256_GCM_SHA384').
-    * @param namedGroup The named group used in key exchange.
-    * @param peerPublicKey The public key of the peer (optional).
-    */
-   constructor(
-      cipher: string,
-      namedGroup: NamedGroup,
-      privateKey?: Uint8Array,
-      publicKey?: Uint8Array,
-      peerPublicKey?: Uint8Array,
-   );
-
-   /**
-    * Derives the handshake secret using the shared key.
-    * @param sharedKey The shared secret.
-    * @returns The handshake secret.
-    */
-   getHandshakeSecret(sharedKey: Uint8Array): Uint8Array;
-
-   /**
-    * Derives the shared secret using the peer's public key.
-    * @param peerPublicKey The public key of the peer.
-    * @returns The shared secret.
+    * Computes the shared secret from the peer's public key.
+    * @param peerPublicKey - The peer's public key.
+    * @returns The shared secret as a `Uint8Array`.
     */
    getSharedSecret(peerPublicKey: Uint8Array): Uint8Array;
-
+ 
    /**
-    * Derives the client handshake traffic key.
-    * @param clientHelloMsg The client's hello message.
-    * @param serverHelloMsg The server's hello message.
-    * @returns The client handshake traffic key.
+    * Updates handshake keys using the provided client and server hello messages.
+    * @param clientHelloMsg - The client hello message.
+    * @param serverHelloMsg - The server hello message.
     */
-   getClientHandShakeTrafficKey(
-      clientHelloMsg: Uint8Array,
-      serverHelloMsg: Uint8Array,
-   ): Uint8Array;
-
+   updateHSKey(clientHelloMsg: Uint8Array, serverHelloMsg: Uint8Array): void;
+ 
    /**
-    * Derives the server handshake traffic key.
-    * @param clientHelloMsg The client's hello message.
-    * @param serverHelloMsg The server's hello message.
-    * @returns The server handshake traffic key.
-    */
-   getServerHandShakeTrafficKey(
-      clientHelloMsg: Uint8Array,
-      serverHelloMsg: Uint8Array,
-   ): Uint8Array;
-
-   /**
-    * Derives the master key from the handshake key.
-    * @returns The master key.
+    * Computes the master key from the handshake secret.
+    * @returns The master key as a `Uint8Array`.
     */
    getMasterKey(): Uint8Array;
-
+ 
    /**
-    * Derives the server's handshake key and IV.
-    */
-   getHandshakeServerKeyNonce(): void;
-
-   /**
-    * Derives the client's handshake key and IV.
-    */
-   getHandshakeClientKeyNonce(): void;
-
-   /**
-    * Derives the finished server key.
-    * @returns The finished server key.
-    */
-   getFinishedServerKey(): Uint8Array;
-
-   /**
-    * Derives the finished client key.
-    * @returns The finished client key.
-    */
-   getFinishedClientKey(): Uint8Array;
-
-   /**
-    * Sets privateKey to this secret class
+    * Sets the private key for the named group.
     */
    set privateKey(key: Uint8Array);
-
+ 
    /**
-    * Sets publicKey to this secret class
+    * Sets the public key for the named group.
     */
    set publicKey(key: Uint8Array);
-}
+ 
+   /**
+    * Updates application keys using various TLS handshake messages.
+    * @param encryptedExtMsg - The encrypted extensions message.
+    * @param certificateMsg - The certificate message.
+    * @param rsaPrivateKey - The RSA private key.
+    * @param signaturescheme - The signature scheme used.
+    * @param certificateVerifyMsg_0 - The certificate verify message (optional).
+    * @param finishedMsg_0 - The finished message from the server (optional).
+    * @param finishedClientMsg_0 - The finished message from the client (optional).
+    */
+   updateAPKey(
+     encryptedExtMsg: Uint8Array,
+     certificateMsg: Uint8Array,
+     rsaPrivateKey: Uint8Array,
+     signaturescheme: any,
+     certificateVerifyMsg_0?: Uint8Array,
+     finishedMsg_0?: Uint8Array,
+     finishedClientMsg_0?: Uint8Array
+   ): Promise<void>;
+ 
+   /**
+    * Computes the resumption secret.
+    * @param ticketNonce - The ticket nonce.
+    * @returns The resumption secret as a `Uint8Array`.
+    */
+   getResumption(ticketNonce?: Uint8Array): Uint8Array;
+ }
+ 
+
+

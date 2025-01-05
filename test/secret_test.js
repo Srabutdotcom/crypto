@@ -14,6 +14,7 @@ const secret = new Secret(Cipher.AES_128_GCM_SHA256, NamedGroup.X25519, serverPr
 await secret.updateHSKey(clientHelloMsg, serverHelloMsg);
 await secret.updateAPKey(encryptedExtensionsMsg, certificateMsg, rsaPrivateKey, SignatureScheme.RSA_PSS_PSS_SHA256, 
    certificateVerifyMsg, finishedMsg, finishedClientMsg);
+secret.getResumption()
 
 assertEquals(secret.hsKey, handshakeKey, "handshake key");
 assertEquals(secret.masterKey, masterKey, "master key");

@@ -1,9 +1,10 @@
 import { hkdfExtract384, hkdfExtract256 } from "../hkdf/hkdf.js";
 import { derivedSecret, hkdfExpandLabel } from "../keyschedule/keyschedule.js";
 import { Aead } from "../aead/aead.js"
-import { /* hmac, */ sha256, sha384 } from "../dep.ts";
+import { /* hmac, */ NamedGroup, p256, p384, p521, sha256, sha384, x25519, x448 } from "../dep.ts";
 import { PskBinderEntry, Binders } from "../dep.ts"
-import { ClientHello, /* HexaDecimal */ } from "../dep.ts"
+import { ClientHello, HexaDecimal } from "../dep.ts"
+import { TranscriptMsg } from "./transcript.js";
 /* import { HMAC } from "@stablelib/hmac";
 import { SHA256 } from "@stablelib/sha256";
 import { SHA384 } from "@stablelib/sha384"; */
@@ -24,6 +25,21 @@ export class Resumed {
    sha
    // binders function
    _binders = binders
+   // derived key
+   derived_key
+   // IKM aka sharedKey
+   IKM
+   // handshake key
+   handshake_key
+   // transcript message
+   transcript = new TranscriptMsg;
+   // derived master key
+   derived_master_key
+   // master key
+   master_key
+   keyHSServer
+   ivHSServer
+   aeadHSServer
    constructor(resumptionKey, clientHelloMsg, sha = 256, keyLength = 16) {
       this.hkdfExtract = sha == 256 ? hkdfExtract256 : sha == 384 ? hkdfExtract384 : hkdfExtract256
       this.early_key = this.hkdfExtract(Uint8Array.of(), resumptionKey)
@@ -41,7 +57,43 @@ export class Resumed {
       this.keyAPClient ||= hkdfExpandLabel(this.client_early_traffic_secret, "key", new Uint8Array, this.keyLength);
       this.ivAPClient ||= hkdfExpandLabel(this.client_early_traffic_secret, "iv", new Uint8Array, 12);
       this.aeadAPClient ||= new Aead(this.keyAPClient, this.ivAPClient);
+      this.derived_key ||= derivedSecret(this.early_key, "derived")
+      this.transcript.insert(this.clientHelloRecord.fragment)
       return this.clientHelloRecord;
+   }
+   handshake(privateKey, peerPublicKey, group){
+      switch (group) {
+         case NamedGroup.X25519.name : {
+            this.group = x25519; break;
+         }
+         case NamedGroup.X448.name : {
+            this.group = x448; break;
+         }
+         case NamedGroup.SECP256R1 :{
+            this.group = p256; break;
+         }
+         case NamedGroup.SECP384R1 : {
+            this.group = p384; break;
+         }
+         case NamedGroup.SECP521R1 : {
+            this.group = p521; break;
+         }
+         default:
+            this.group = x25519
+            break;
+      }
+      this.IKM = this.group.getSharedSecret(privateKey, peerPublicKey);
+      this.handshake_key = this.hkdfExtract(this.derived_key, this.IKM)
+   }
+   deriveHandshake(serverHelloMsg){
+      this.transcript.insert(serverHelloMsg);
+      this.hsTrafficKeyClient ||= derivedSecret(this.handshake_key, 'c hs traffic', this.transcript.byte);
+      this.hsTrafficKeyServer ||= derivedSecret(this.handshake_key, 's hs traffic', this.transcript.byte);
+      this.derived_master_key ||= derivedSecret(this.handshake_key, "derived")
+      this.master_key = this.hkdfExtract(this.derived_master_key)
+      this.keyHSServer ||= hkdfExpandLabel(this.hsTrafficKeyServer, "key", new Uint8Array, this.keyLength);
+      this.ivHSServer ||= hkdfExpandLabel(this.hsTrafficKeyServer, "iv", new Uint8Array, 12);
+      this.aeadHSServer ||= new Aead(this.keyHSServer, this.ivAPClient);
    }
 }
 
