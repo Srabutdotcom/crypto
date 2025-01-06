@@ -13,7 +13,7 @@ export const serverHelloMsg = HexaDecimal.fromString(`02 00 00 5c 03 03 3c cf d2
          27 63 47 2a e8 13 67 77 c9 d7 35 87 77 bb 66 e9 1e a5 12 24 95
          f5 59 ea 2d 00 13 01 00 00 34 00 29 00 02 00 00 00 33 00 24 00
          1d 00 20 12 17 61 ee 42 c3 33 e1 b9 e7 7b 60 dd 57 c2 05 3c d9
-         45 12 ab 47 f1 15 e8 6e ff 50 94 2c ea 31 00 2b 00 02 03 04`).byte;  
+         45 12 ab 47 f1 15 e8 6e ff 50 94 2c ea 31 00 2b 00 02 03 04`).byte;
 
 const serverHelloMsg_0 = ServerHello.from(serverHelloMsg.slice(4));
 
@@ -48,6 +48,15 @@ export const ivHSServer = HexaDecimal.fromString(`95 69 ec dd 4d 05 36 70 5e 9e 
 export const encryptedExtensionsMsg = HexaDecimal.fromString(`08 00 00 28 00 26 00 0a 00 14 00
          12 00 1d 00 17 00 18 00 19 01 00 01 01 01 02 01 03 01 04 00 1c
          00 02 40 01 00 00 00 00 00 2a 00 00`).byte
+
+export const finishedKeyServer = HexaDecimal.fromString(`4b b7 4c ae 7a 5d c8 91 46 04 c0 bf be 2f
+         0c 06 23 96 88 39 22 be c8 a1 5e 2a 9b 53 2a 5d 39 2c`).byte;
+
+export const finished = HexaDecimal.fromString(`48 d3 e0 e1 b3 d9 07 c6 ac ff 14 5e 16 09
+         03 88 c7 7b 05 c0 50 b6 34 ab 1a 88 bb d0 dd 1a 34 b2`).byte;
+
+export const finishedMsg = safeuint8array(Uint8Array.of(0x14, 0, 0, 0x20), finished)
+
 
 
 const _n = null; debugger;

@@ -5,7 +5,7 @@ import { assertEquals } from "@std/assert";
 import { HexaDecimal, ClientHello, ContentType, NamedGroup, ServerHello } from "../src/dep.ts";
 import { derivedSecret } from "../src/keyschedule/keyschedule.js"
 import { Resumed } from "../src/secret/resumed.js";
-import { serverPrivateKey, serverHelloMsg, chs, shs, d_master_key, master_key, encryptedExtensionsMsg } from "../test/data resumed 0-RTT/server.js";
+import { serverPrivateKey, serverHelloMsg, chs, shs, d_master_key, master_key, encryptedExtensionsMsg, finishedKeyServer } from "../test/data resumed 0-RTT/server.js";
 import { clientPublicKey } from "./data resumed 0-RTT/client.js";
 import { serverHelloRecord_0, ivHSServer, keyHSServer, } from "../test/data resumed 0-RTT/server.js";
 import { EncryptedExtensions } from "../src/dep.ts"
@@ -41,5 +41,9 @@ assertEquals(resumed.keyHSServer.toString(), keyHSServer.toString());
 assertEquals(resumed.ivHSServer.toString(), ivHSServer.toString())
 
 const encryptedExtensionsMsg_0 = EncryptedExtensions.fromHandshake(encryptedExtensionsMsg).handshake;
+
+assertEquals(resumed.finishedKeyServer.toString(), finishedKeyServer.toString())
+
+const finish = await resumed.derivedFinish(encryptedExtensionsMsg_0);
 
 const _n = null; 

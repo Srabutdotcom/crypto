@@ -3,8 +3,10 @@ import { derivedSecret, hkdfExpandLabel } from "../keyschedule/keyschedule.js";
 import { Aead } from "../aead/aead.js"
 import { /* hmac, */ NamedGroup, p256, p384, p521, sha256, sha384, x25519, x448 } from "../dep.ts";
 import { PskBinderEntry, Binders } from "../dep.ts"
-import { ClientHello, HexaDecimal } from "../dep.ts"
+import { ClientHello, Finished, HexaDecimal } from "../dep.ts"
 import { TranscriptMsg } from "./transcript.js";
+import { finished as finished_0, finishedMsg as finishedMsg_0 } from "../../test/data resumed 0-RTT/server.js";
+import { assertEquals } from "@std/assert/equals";
 /* import { HMAC } from "@stablelib/hmac";
 import { SHA256 } from "@stablelib/sha256";
 import { SHA384 } from "@stablelib/sha384"; */
@@ -40,6 +42,9 @@ export class Resumed {
    keyHSServer
    ivHSServer
    aeadHSServer
+   finishedKeyServer
+   finishedKeyClient
+   _finished = finished
    constructor(resumptionKey, clientHelloMsg, sha = 256, keyLength = 16) {
       this.hkdfExtract = sha == 256 ? hkdfExtract256 : sha == 384 ? hkdfExtract384 : hkdfExtract256
       this.early_key = this.hkdfExtract(Uint8Array.of(), resumptionKey)
@@ -94,6 +99,17 @@ export class Resumed {
       this.keyHSServer ||= hkdfExpandLabel(this.hsTrafficKeyServer, "key", new Uint8Array, this.keyLength);
       this.ivHSServer ||= hkdfExpandLabel(this.hsTrafficKeyServer, "iv", new Uint8Array, 12);
       this.aeadHSServer ||= new Aead(this.keyHSServer, this.ivAPClient);
+      this.finishedKeyServer ||= hkdfExpandLabel(this.hsTrafficKeyServer, 'finished', new Uint8Array);
+      this.finishedKeyClient ||= hkdfExpandLabel(this.hsTrafficKeyClient, 'finished', new Uint8Array);
+   }
+   async derivedFinish(encryptedExtensionsMsg){
+      this.transcript.insert(encryptedExtensionsMsg)
+      const finish = await this._finished(this.finishedKeyServer, this.transcript.byte, this.sha);
+      //assertEquals(finish.toString(), finished_0.toString())
+      const finishedMsg = new Finished(finish)
+      assertEquals(finishedMsg.toString(), finishedMsg_0.toString())
+      debugger;
+      //TODO - 
    }
 }
 
