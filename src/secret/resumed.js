@@ -3,10 +3,10 @@ import { derivedSecret, hkdfExpandLabel } from "../keyschedule/keyschedule.js";
 import { Aead } from "../aead/aead.js"
 import { /* hmac, */ NamedGroup, p256, p384, p521, sha256, sha384, x25519, x448 } from "../dep.ts";
 import { PskBinderEntry, Binders } from "../dep.ts"
-import { ClientHello, /* Finished,  */HexaDecimal } from "../dep.ts"
+import { ClientHello, /* Finished,  HexaDecimal*/ } from "../dep.ts"
 import { TranscriptMsg } from "./transcript.js";
-import { finished as finished_0, finishedMsg as finishedMsg_0 } from "../../test/data resumed 0-RTT/server.js";
-import { assertEquals } from "@std/assert/equals";
+//import { finished as finished_0, finishedMsg as finishedMsg_0 } from "../../test/data resumed 0-RTT/server.js";
+//import { assertEquals } from "@std/assert/equals";
 import { Finished } from "@tls/auth"
 import { safeuint8array, ContentType, EndOfEarlyData } from "../dep.ts";
 /* import { HMAC } from "@stablelib/hmac";
@@ -153,9 +153,9 @@ export class Resumed {
       const finished = new Finished(finish)
       //assertEquals(finished.handshake.toString(), finishedMsg_0.toString())
       this.transcript.insert(finished.handshake);
-      const record = await this.aeadHSClient.encrypt(finished.handshake.tlsInnerPlaintext())
+      const _record = await this.aeadHSClient.encrypt(finished.handshake.tlsInnerPlaintext())
       this.res_master ||= derivedSecret(this.master_key, "res master", this.transcript.byte);
-      debugger;
+      
    }
 }
 
