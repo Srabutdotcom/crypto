@@ -3,10 +3,12 @@ import { derivedSecret, hkdfExpandLabel } from "../keyschedule/keyschedule.js";
 import { Aead } from "../aead/aead.js"
 import { /* hmac, */ NamedGroup, p256, p384, p521, sha256, sha384, x25519, x448 } from "../dep.ts";
 import { PskBinderEntry, Binders } from "../dep.ts"
-import { ClientHello, Finished, HexaDecimal } from "../dep.ts"
+import { ClientHello, /* Finished,  */HexaDecimal } from "../dep.ts"
 import { TranscriptMsg } from "./transcript.js";
 import { finished as finished_0, finishedMsg as finishedMsg_0 } from "../../test/data resumed 0-RTT/server.js";
 import { assertEquals } from "@std/assert/equals";
+import { Finished } from "@tls/auth"
+import { safeuint8array, ContentType, EndOfEarlyData } from "../dep.ts";
 /* import { HMAC } from "@stablelib/hmac";
 import { SHA256 } from "@stablelib/sha256";
 import { SHA384 } from "@stablelib/sha384"; */
@@ -39,15 +41,32 @@ export class Resumed {
    derived_master_key
    // master key
    master_key
+   keyEarlyAppClient
+   ivEarlyAppClient
+   aeadEarlyAppClient
    keyHSServer
    ivHSServer
    aeadHSServer
+   keyHSClient
+   ivHSClient
+   aeadHSClient
    finishedKeyServer
    finishedKeyClient
    _finished = finished
+   apKeyClient
+   apKeyServer
+   keyAPServer
+   keyAPClient
+   ivAPServer
+   ivAPClient
+   aeadAPClient
+   aeadAPServer
+
+   res_master
    constructor(resumptionKey, clientHelloMsg, sha = 256, keyLength = 16) {
       this.hkdfExtract = sha == 256 ? hkdfExtract256 : sha == 384 ? hkdfExtract384 : hkdfExtract256
       this.early_key = this.hkdfExtract(Uint8Array.of(), resumptionKey)
+      this.derived_key ||= derivedSecret(this.early_key, "derived")
       this.binder_key = derivedSecret(this.early_key, "res binder", Uint8Array.of())
       this.finish_key = hkdfExpandLabel(this.binder_key, 'finished', Uint8Array.of())
       this.initClientHello = clientHelloMsg
@@ -59,10 +78,10 @@ export class Resumed {
       this.clientHelloRecord = addBinders(binders, this.initClientHello);
       this.client_early_traffic_secret = derivedSecret(this.early_key, "c e traffic", this.clientHelloRecord.fragment);
       this.early_exporter_master_secret = derivedSecret(this.early_key, "e exp master", this.clientHelloRecord.fragment);
-      this.keyAPClient ||= hkdfExpandLabel(this.client_early_traffic_secret, "key", new Uint8Array, this.keyLength);
-      this.ivAPClient ||= hkdfExpandLabel(this.client_early_traffic_secret, "iv", new Uint8Array, 12);
-      this.aeadAPClient ||= new Aead(this.keyAPClient, this.ivAPClient);
-      this.derived_key ||= derivedSecret(this.early_key, "derived")
+      this.keyEarlyAppClient ||= hkdfExpandLabel(this.client_early_traffic_secret, "key", new Uint8Array, this.keyLength);
+      this.ivEarlyAppClient ||= hkdfExpandLabel(this.client_early_traffic_secret, "iv", new Uint8Array, 12);
+      this.aeadEarlyAppClient ||= new Aead(this.keyEarlyAppClient, this.ivEarlyAppClient);
+      
       this.transcript.insert(this.clientHelloRecord.fragment)
       return this.clientHelloRecord;
    }
@@ -98,7 +117,10 @@ export class Resumed {
       this.master_key = this.hkdfExtract(this.derived_master_key)
       this.keyHSServer ||= hkdfExpandLabel(this.hsTrafficKeyServer, "key", new Uint8Array, this.keyLength);
       this.ivHSServer ||= hkdfExpandLabel(this.hsTrafficKeyServer, "iv", new Uint8Array, 12);
-      this.aeadHSServer ||= new Aead(this.keyHSServer, this.ivAPClient);
+      this.aeadHSServer ||= new Aead(this.keyHSServer, this.ivHSServer);
+      this.keyHSClient ||= hkdfExpandLabel(this.hsTrafficKeyClient, "key", new Uint8Array, this.keyLength);
+      this.ivHSClient ||= hkdfExpandLabel(this.hsTrafficKeyClient, "iv", new Uint8Array, 12);
+      this.aeadHSClient ||= new Aead(this.keyHSServer, this.ivHSClient);
       this.finishedKeyServer ||= hkdfExpandLabel(this.hsTrafficKeyServer, 'finished', new Uint8Array);
       this.finishedKeyClient ||= hkdfExpandLabel(this.hsTrafficKeyClient, 'finished', new Uint8Array);
    }
@@ -106,10 +128,34 @@ export class Resumed {
       this.transcript.insert(encryptedExtensionsMsg)
       const finish = await this._finished(this.finishedKeyServer, this.transcript.byte, this.sha);
       //assertEquals(finish.toString(), finished_0.toString())
-      const finishedMsg = new Finished(finish)
-      assertEquals(finishedMsg.toString(), finishedMsg_0.toString())
+      const finished = new Finished(finish)
+      //assertEquals(finished.handshake.toString(), finishedMsg_0.toString())
+      const data = safeuint8array(encryptedExtensionsMsg, finished.handshake);
+      const tlsInnerPlaintextOfRecord = ContentType.APPLICATION_DATA.tlsInnerPlaintext(data)
+      const record = await this.aeadHSServer.encrypt(tlsInnerPlaintextOfRecord);
+      this.transcript.insert(finished.handshake)
+      this.apKeyClient ||= derivedSecret(this.master_key, "c ap traffic", this.transcript.byte);
+      this.apKeyServer ||= derivedSecret(this.master_key, "s ap traffic", this.transcript.byte);
+      this.expMaster ||= derivedSecret(this.master_key, "exp master", this.transcript.byte);
+      this.keyAPServer ||= hkdfExpandLabel(this.apKeyServer, "key", new Uint8Array, this.keyLength);
+      this.ivAPServer ||= hkdfExpandLabel(this.apKeyServer, "iv", new Uint8Array, 12);
+      this.keyAPClient ||= hkdfExpandLabel(this.apKeyClient, "key", new Uint8Array, this.keyLength);
+      this.ivAPClient ||= hkdfExpandLabel(this.apKeyClient, "iv", new Uint8Array, 12);
+      this.aeadAPClient ||= new Aead(this.keyAPClient, this.ivAPClient);
+      this.aeadAPServer ||= new Aead(this.keyAPServer, this.ivAPServer);
+      return record
+   }
+   async derivedFinishClient(){
+      const endOfEarlyData = new EndOfEarlyData
+      this.transcript.insert(endOfEarlyData.handshake)
+      const finish = await this._finished(this.finishedKeyClient, this.transcript.byte, this.sha);
+      //assertEquals(finish.toString(), finished_0.toString())
+      const finished = new Finished(finish)
+      //assertEquals(finished.handshake.toString(), finishedMsg_0.toString())
+      this.transcript.insert(finished.handshake);
+      const record = await this.aeadHSClient.encrypt(finished.handshake.tlsInnerPlaintext())
+      this.res_master ||= derivedSecret(this.master_key, "res master", this.transcript.byte);
       debugger;
-      //TODO - 
    }
 }
 

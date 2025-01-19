@@ -57,6 +57,19 @@ export const finished = HexaDecimal.fromString(`48 d3 e0 e1 b3 d9 07 c6 ac ff 14
 
 export const finishedMsg = safeuint8array(Uint8Array.of(0x14, 0, 0, 0x20), finished)
 
+export const handshake_record = safeuint8array(encryptedExtensionsMsg, finishedMsg);
 
+export const c_ap_traffic_key = HexaDecimal.fromString(`2a bb f2 b8 e3 81 d2 3d be be 1d d2 a7 d1
+         6a 8b f4 84 cb 49 50 d2 3f b7 fb 7f a8 54 70 62 d9 a1`).byte
 
-const _n = null; debugger;
+export const s_ap_traffic_key = HexaDecimal.fromString(`cc 21 f1 bf 8f eb 7d d5 fa 50 5b d9 c4 b4
+         68 a9 98 4d 55 4a 99 3d c4 9e 6d 28 55 98 fb 67 26 91`).byte
+
+export const exp_master_key = HexaDecimal.fromString(`3f d9 3d 4f fd dc 98 e6 4b 14 dd 10 7a ed
+         f8 ee 4a dd 23 f4 51 0f 58 a4 59 2d 0b 20 1b ee 56 b4`).byte
+
+export const write_traffic_key = HexaDecimal.fromString(`e8 57 c6 90 a3 4c 5a 91 29 d8 33 61 96
+         84 f9 5e`).byte;
+export const write_traffic_iv = HexaDecimal.fromString(`06 85 d6 b5 61 aa b9 ef 10 13 fa f9`).byte
+
+const _n = null; 

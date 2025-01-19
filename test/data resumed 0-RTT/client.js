@@ -97,3 +97,21 @@ const pskBinder_0 = hmac(sha256, finishKey, clientHelloMsg )
 
 const hash = await crypto.subtle.digest({name:"SHA-256"},clientHelloMsg);
 const hashMsg = new Uint8Array(hash) */
+
+export const keyHSClient = HexaDecimal.fromString(`b1 53 08 06 f4 ad fe ac 83 f1 41 30 32
+         bb fa 82`).byte;
+export const ivHSClient = HexaDecimal.fromString(`eb 50 c1 6b e7 65 4a bf 99 dd 06 d9`).byte
+
+export const finishClient = HexaDecimal.fromString(`72 30 a9 c9 52 c2 5c d6 13 8f c5 e6 62 83
+      08 c4 1c 53 35 dd 81 b9 f9 6b ce a5 0f d3 2b da 41 6d`).byte;
+
+export const keyAPClient = HexaDecimal.fromString(`3c f1 22 f3 01 c6 35 8c a7 98 95 53 25
+         0e fd 72`).byte;
+export const ivAPClient = HexaDecimal.fromString(`ab 1a ec 26 aa 78 b8 fc 11 76 b9 ac`).byte
+
+export const res_master_key = HexaDecimal.fromString(`5e 95 bd f1 f8 90 05 ea 2e 9a a0 ba 85 e7
+         28 e3 c1 9c 5f e0 c6 99 e3 f5 be e5 9f ae bd 0b 54 06`).byte;
+
+
+
+
