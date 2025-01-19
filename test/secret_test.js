@@ -1,12 +1,12 @@
 import { Cipher, HexaDecimal, NamedGroup, SignatureScheme, ContentType } from "../src/dep.ts";
 import { Secret } from "../src/secret/secret.js";
-import { serverPrivateKey, serverPublicKey, serverHelloMsg, data } from "./data simple 1-RTT/server.js";
-import { clientPublicKey, clientHelloMsg } from "./data simple 1-RTT/client.js";
-import { handshakeKey, masterKey, keyHSServer, ivHSServer, finishedKeyServer } from "./data simple 1-RTT/server.js";
-import { encryptedExtensionsMsg, certificateMsg, rsaPrivateKey, certificateVerifyMsg, finishedMsg, finishedClientMsg } from "./data simple 1-RTT/server.js";
-import { expMasterKey, keyAPServer, ivAPServer, keyHSClient, ivHSClient } from "./data simple 1-RTT/server.js";
-import { keyAPClient, ivAPClient, finishedKeyClient, resMaster, resumption } from "./data simple 1-RTT/server.js";
-import { newSessionTicket } from "./data simple 1-RTT/server.js";
+import { serverPrivateKey, serverPublicKey, serverHelloMsg, data } from "./data_simple_1-RTT/server.js";
+import { clientPublicKey, clientHelloMsg } from "./data_simple_1-RTT/client.js";
+import { handshakeKey, masterKey, keyHSServer, ivHSServer, finishedKeyServer } from "./data_simple_1-RTT/server.js";
+import { encryptedExtensionsMsg, certificateMsg, rsaPrivateKey, certificateVerifyMsg, finishedMsg, finishedClientMsg } from "./data_simple_1-RTT/server.js";
+import { expMasterKey, keyAPServer, ivAPServer, keyHSClient, ivHSClient } from "./data_simple_1-RTT/server.js";
+import { keyAPClient, ivAPClient, finishedKeyClient, resMaster, resumption } from "./data_simple_1-RTT/server.js";
+import { newSessionTicket } from "./data_simple_1-RTT/server.js";
 import { assertEquals } from "jsr:@std/assert"
 
 const secret = new Secret(Cipher.AES_128_GCM_SHA256, NamedGroup.X25519, serverPrivateKey, serverPublicKey, clientPublicKey);

@@ -1,19 +1,19 @@
-import { resumption } from "./data simple 1-RTT/server.js";
+import { resumption } from "./data_simple_1-RTT/server.js";
 import { binderKey, ce_trafficKey, clientHelloMsg, clientHelloRecord, 
    e_exp_trafficKey, earlyKey, finishKey, keyHSClient, ivHSClient,
    keyAPClient, ivAPClient,
    res_master_key,
-} from "./data resumed 0-RTT/client.js";
+} from "./data_resumed_0-RTT/client.js";
 import { binders } from "../src/secret/pskbinder.js";
 import { assertEquals } from "@std/assert";
 import { HexaDecimal, ClientHello, ContentType, NamedGroup, ServerHello } from "../src/dep.ts";
 import { derivedSecret } from "../src/keyschedule/keyschedule.js"
 import { Resumed } from "../src/secret/resumed.js";
-import { serverPrivateKey, serverHelloMsg, chs, shs, d_master_key, master_key, encryptedExtensionsMsg, finishedKeyServer, c_ap_traffic_key, s_ap_traffic_key, write_traffic_key, write_traffic_iv, exp_master_key } from "../test/data resumed 0-RTT/server.js";
-import { clientPublicKey } from "./data resumed 0-RTT/client.js";
-import { serverHelloRecord_0, ivHSServer, keyHSServer, } from "../test/data resumed 0-RTT/server.js";
+import { serverPrivateKey, serverHelloMsg, chs, shs, d_master_key, master_key, encryptedExtensionsMsg, finishedKeyServer, c_ap_traffic_key, s_ap_traffic_key, write_traffic_key, write_traffic_iv, exp_master_key } from "./data_resumed_0-RTT/server.js";
+import { clientPublicKey } from "./data_resumed_0-RTT/client.js";
+import { serverHelloRecord_0, ivHSServer, keyHSServer, } from "./data_resumed_0-RTT/server.js";
 import { EncryptedExtensions, EndOfEarlyData } from "../src/dep.ts"
-import { derivedKey } from "./data resumed 0-RTT/server.js";
+import { derivedKey } from "./data_resumed_0-RTT/server.js";
 import { Alert, AlertDescription } from "jsr:@tls/enum@~0.4.9";
 
 const resumed = new Resumed(resumption, clientHelloMsg, 256);
