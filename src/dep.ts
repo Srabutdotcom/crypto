@@ -9,6 +9,9 @@ export { p384 } from '@noble/curves/p384';
 export { p521 } from '@noble/curves/p521';
 export { AES } from "@stablelib/aes";
 export { GCM } from "@stablelib/gcm";
+export { SHA256 } from "@stablelib/sha256";
+export { SHA384 } from "@stablelib/sha384";
+export { HMAC } from "@stablelib/hmac";
 export { siv } from "@noble/ciphers/aes";
 export * from "@tls/struct"
 export * from "@tls/enum"
