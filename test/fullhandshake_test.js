@@ -8,6 +8,6 @@ import { TLSCiphertext } from "../src/dep.ts";
 
 const test = new FullHandshake(ClientHello.from(clientHello), ServerHello.from(serverHello), clientPrivateKey, HandshakeRole.CLIENT);
 
-//const decrypted = await test.aead_hs_s.decrypt(TLSCiphertext.from(application_data));
+const decrypted = await test.aead_hs_s.decrypt(TLSCiphertext.from(application_data));
 
 //debugger;
