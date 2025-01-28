@@ -1,6 +1,6 @@
 {
   "name": "@tls/crypto",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "exports": "./src/mod.ts",
   "publish": {
     "exclude": ["dist/"]
@@ -27,7 +27,7 @@
     "@tls/enum": "jsr:@tls/enum@^0.6.5",
     "@tls/extension": "jsr:@tls/extension@^0.2.9",
     "@tls/keyexchange": "jsr:@tls/keyexchange@^0.2.0",
-    "@tls/param": "jsr:@tls/param@^0.1.6",
+    "@tls/param": "jsr:@tls/param@^0.1.7",
     "@tls/struct": "jsr:@tls/struct@^0.3.6"
   }
 }
