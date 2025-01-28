@@ -1,6 +1,6 @@
-import { Cipher, HexaDecimal, NamedGroup, SignatureScheme, ContentType } from "../src/dep.ts";
+import { Cipher, HexaDecimal, NamedGroup, SignatureScheme, ContentType, TLSCiphertext } from "../src/dep.ts";
 import { Secret } from "../src/secret/secret.js";
-import { serverPrivateKey, serverPublicKey, serverHelloMsg, data } from "./data_simple_1-RTT/server.js";
+import { serverPrivateKey, serverPublicKey, serverHelloMsg, data, completeRecord } from "./data_simple_1-RTT/server.js";
 import { clientPublicKey, clientHelloMsg } from "./data_simple_1-RTT/client.js";
 import { handshakeKey, masterKey, keyHSServer, ivHSServer, finishedKeyServer } from "./data_simple_1-RTT/server.js";
 import { encryptedExtensionsMsg, certificateMsg, rsaPrivateKey, certificateVerifyMsg, finishedMsg, finishedClientMsg } from "./data_simple_1-RTT/server.js";
@@ -8,10 +8,17 @@ import { expMasterKey, keyAPServer, ivAPServer, keyHSClient, ivHSClient } from "
 import { keyAPClient, ivAPClient, finishedKeyClient, resMaster, resumption } from "./data_simple_1-RTT/server.js";
 import { newSessionTicket } from "./data_simple_1-RTT/server.js";
 import { assertEquals } from "jsr:@std/assert"
+import { FullHandshake, HandshakeRole } from "../src/secret/fullhandshake.js";
+import { ClientHello, ServerHello } from "../src/dep.ts";
 
 const secret = new Secret(Cipher.AES_128_GCM_SHA256, NamedGroup.X25519, serverPrivateKey, serverPublicKey, clientPublicKey);
 //update handshake key
 await secret.updateHSKey(clientHelloMsg, serverHelloMsg);
+const fullHS = new FullHandshake(ClientHello.fromHandshake(clientHelloMsg), ServerHello.fromHandshake(serverHelloMsg), serverPrivateKey, HandshakeRole.SERVER, secret )
+
+const readBack = await secret.aeadHSServer.decrypt(TLSCiphertext.from(completeRecord)); 
+const readBack_0 = await fullHS.aead_hs_s.decrypt(TLSCiphertext.from(completeRecord));debugger;
+
 await secret.updateAPKey(encryptedExtensionsMsg, certificateMsg, rsaPrivateKey, SignatureScheme.RSA_PSS_PSS_SHA256, 
    certificateVerifyMsg, finishedMsg, finishedClientMsg);
 secret.getResumption()

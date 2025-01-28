@@ -1,6 +1,6 @@
 import { HexaDecimal } from "../../src/dep.ts";
 
-const _clientPrivateKey = HexaDecimal.fromString(
+export const clientPrivateKey = HexaDecimal.fromString(
    `49 af 42 ba 7f 79 94 85 2d 71 3e f2 78
    4b cb ca a7 91 1d e2 6a dc 56 42 cb 63 45 40 e7 ea 50 05`).byte
 
