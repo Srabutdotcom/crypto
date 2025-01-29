@@ -1,5 +1,6 @@
 //@ts-self-types="../../type/aead/aead.d.ts"
-import { TLSCiphertext/* , Crypto */ } from "../dep.ts"
+import { TLSCiphertext,/* , Crypto */ 
+TLSInnerPlaintext} from "../dep.ts"
 import { AES } from "../dep.ts"
 import { GCM } from "../dep.ts"
 import { siv } from "../dep.ts"
@@ -87,7 +88,7 @@ export class Aead { //*AESGCM
          //tagLength: 128 //*by default is 128
       }, this.cryptoKey, tlsCipherText.encrypted_record);
       this.buildIVDec()
-      return new Uint8Array(output);
+      return TLSInnerPlaintext.from(new Uint8Array(output));
    }
 
    seal(tlsInnerPlaintext){
@@ -100,7 +101,7 @@ export class Aead { //*AESGCM
    open(tlsCipherText){
       const opened = this.gcm.open(this.ivDec, tlsCipherText.encrypted_record, tlsCipherText.header);
       this.buildIVDec();
-      return opened;
+      return TLSInnerPlaintext.from(opened);
    }
 
    sivSeal(tlsInnerPlaintext){
@@ -115,7 +116,7 @@ export class Aead { //*AESGCM
       const aes = siv(this.key, this.ivDec, tlsCipherText.header)
       const opened = aes.decrypt(tlsCipherText.encrypted_record)
       this.buildIVDec();
-      return opened;
+      return TLSInnerPlaintext.from(opened);
    }
 }
 

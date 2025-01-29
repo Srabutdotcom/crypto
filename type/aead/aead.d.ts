@@ -72,9 +72,9 @@ export class Aead {
   /**
    * Decrypts the given ciphertext using AES-GCM.
    * @param {TLSCiphertext} tlsCipherText - The ciphertext to decrypt.
-   * @returns {Promise<Uint8Array>} The decrypted plaintext.
+   * @returns {Promise<TLSInnerPlaintext>} The decrypted plaintext.
    */
-  decrypt(tlsCipherText: TLSCiphertext): Promise<Uint8Array>;
+  decrypt(tlsCipherText: TLSCiphertext): Promise<TLSInnerPlaintext>;
 
   /**
    * Encrypts the given plaintext using a custom AES-GCM implementation.
@@ -86,9 +86,9 @@ export class Aead {
   /**
    * Decrypts the given ciphertext using a custom AES-GCM implementation.
    * @param {TLSCiphertext} tlsCipherText - The ciphertext to decrypt.
-   * @returns {Uint8Array} The decrypted plaintext.
+   * @returns {TLSInnerPlaintext} The decrypted plaintext.
    */
-  open(tlsCipherText: TLSCiphertext): Uint8Array;
+  open(tlsCipherText: TLSCiphertext): TLSInnerPlaintext;
 
   /**
    * Encrypts the given plaintext using AES-SIV (Synthetic Initialization Vector).
@@ -100,9 +100,9 @@ export class Aead {
   /**
    * Decrypts the given ciphertext using AES-SIV.
    * @param {TLSCiphertext} tlsCipherText - The ciphertext to decrypt.
-   * @returns {Uint8Array} The decrypted plaintext.
+   * @returns {TLSInnerPlaintext} The decrypted plaintext.
    */
-  sivOpen(tlsCipherText: TLSCiphertext): Uint8Array;
+  sivOpen(tlsCipherText: TLSCiphertext): TLSInnerPlaintext;
 }
 
 /**

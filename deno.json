@@ -1,6 +1,6 @@
 {
   "name": "@tls/crypto",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "exports": "./src/mod.ts",
   "publish": {
     "exclude": ["dist/"]
@@ -28,6 +28,6 @@
     "@tls/extension": "jsr:@tls/extension@^0.2.9",
     "@tls/keyexchange": "jsr:@tls/keyexchange@^0.2.0",
     "@tls/param": "jsr:@tls/param@^0.1.7",
-    "@tls/struct": "jsr:@tls/struct@^0.3.6"
+    "@tls/struct": "jsr:@tls/struct@^0.3.7"
   }
 }
