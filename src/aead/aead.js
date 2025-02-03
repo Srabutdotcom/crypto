@@ -3,7 +3,6 @@ import { TLSCiphertext,/* , Crypto */
 TLSInnerPlaintext} from "../dep.ts"
 import { AES } from "../dep.ts"
 import { GCM } from "../dep.ts"
-import { siv } from "../dep.ts"
 
 //const crypto = new Crypto();
 
@@ -104,20 +103,6 @@ export class Aead { //*AESGCM
       return TLSInnerPlaintext.from(opened);
    }
 
-   sivSeal(tlsInnerPlaintext){
-      const _header = header(tlsInnerPlaintext, this.key.length);
-      const aes = siv(this.key, this.ivEnc, _header)
-      const sealed = aes.encrypt(tlsInnerPlaintext);
-      this.buildIVEnc();
-      return new TLSCiphertext(sealed);
-   }
-
-   sivOpen(tlsCipherText){
-      const aes = siv(this.key, this.ivDec, tlsCipherText.header)
-      const opened = aes.decrypt(tlsCipherText.encrypted_record)
-      this.buildIVDec();
-      return TLSInnerPlaintext.from(opened);
-   }
 }
 
 function header(tlsInnerPlaintext, keyLength){

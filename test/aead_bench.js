@@ -1,6 +1,7 @@
 import { HexaDecimal } from "../src/dep.ts";
 import { AES } from "@stablelib/aes";
 import { GCM } from "@stablelib/gcm"
+import { gcm } from "@noble/ciphers/aes"
 
 const key = HexaDecimal.fromString("5394E890D37BA55EC9D5F327F15680F6A63EF5279C79331643AD0AF6D2623525");
 const nonce = HexaDecimal.fromString("815E840B7ACA7AF3B324583F");
@@ -62,8 +63,12 @@ Deno.bench("AES-GCM using webcrypto", async () => {
 
 
 const cipher = new AES(key.byte)
-const gcm = new GCM(cipher);
+const gcm_ = new GCM(cipher);
 
-const sealed = gcm.seal(nonce.byte, plaintext.byte, ad.byte);
-const open = gcm.open(nonce.byte, result.byte, ad.byte)
+const sealed = gcm_.seal(nonce.byte, plaintext.byte, ad.byte);
+const open = gcm_.open(nonce.byte, result.byte, ad.byte)
+
+const cipherText = gcm(key.byte, ad.byte).encrypt(plaintext.byte);
+const plainText = gcm(key.byte, ad.byte).decrypt(cipherText);
+
 const n = null;

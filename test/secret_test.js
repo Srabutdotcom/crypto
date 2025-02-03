@@ -1,4 +1,4 @@
-import { Cipher, HexaDecimal, NamedGroup, SignatureScheme, ContentType, TLSCiphertext } from "../src/dep.ts";
+import { Cipher, HexaDecimal, NamedGroup, SignatureScheme, ContentType, TLSCiphertext, TLSInnerPlaintext } from "../src/dep.ts";
 import { Secret } from "../src/secret/secret.js";
 import { serverPrivateKey, serverPublicKey, serverHelloMsg, data, completeRecord } from "./data_simple_1-RTT/server.js";
 import { clientPublicKey, clientHelloMsg } from "./data_simple_1-RTT/client.js";
@@ -39,12 +39,12 @@ assertEquals(secret.ivAPClient, ivAPClient, "iv application client");
 assertEquals(secret.resMaster, resMaster, "res master key");
 assertEquals(secret.resumption, resumption, "resumption key");
 
-const tlsInnerPlaintextOfNewSessionTicket = ContentType.APPLICATION_DATA.tlsInnerPlaintext(newSessionTicket)
+const tlsInnerPlaintextOfNewSessionTicket = new TLSInnerPlaintext(newSessionTicket, ContentType.APPLICATION_DATA)
 // send to Client
 const newSessionTicketRecord = await secret.aeadAPServer.encrypt(tlsInnerPlaintextOfNewSessionTicket)
 const newSessionTicketRecord_0 = await secret.aeadAPServer.decrypt(newSessionTicketRecord)
 
-const dataContent = ContentType.APPLICATION_DATA.tlsInnerPlaintext(data);
+const dataContent = new TLSInnerPlaintext(data, ContentType.APPLICATION_DATA);
 // data from Client = 
 const dataFromClient = await secret.aeadAPClient.encrypt(dataContent);
 const dataFromClient_0 = await secret.aeadAPClient.decrypt(dataFromClient);
@@ -52,7 +52,7 @@ const dataFromClient_0 = await secret.aeadAPClient.decrypt(dataFromClient);
 const dataFromServer = await secret.aeadAPServer.encrypt(dataContent); 
 const dataFromServer_0 = await secret.aeadAPServer.decrypt(dataFromServer); 
 
-const alert = ContentType.ALERT.tlsInnerPlaintext(Uint8Array.of(1,0));
+const alert =  new TLSInnerPlaintext(Uint8Array.of(1,0), ContentType.ALERT);
 // client send alert
 const alertFromClient = await secret.aeadAPClient.encrypt(alert);
 const alertFromClient_0 = await secret.aeadAPClient.decrypt(alertFromClient);

@@ -1,4 +1,4 @@
-import { TLSInnerPlaintext, TLSCiphertext } from "@tls/enum"
+import { TLSInnerPlaintext, TLSCiphertext } from "../../src/dep.ts"
 
 /**
  * Represents an AEAD (Authenticated Encryption with Associated Data) using AES-GCM.

@@ -6,7 +6,7 @@ import { binderKey, ce_trafficKey, clientHelloMsg, clientHelloRecord,
 } from "./data_resumed_0-RTT/client.js";
 import { binders } from "../src/secret/pskbinder.js";
 import { assertEquals } from "@std/assert";
-import { HexaDecimal, ClientHello, ContentType, NamedGroup, ServerHello } from "../src/dep.ts";
+import { HexaDecimal, ClientHello, ContentType, NamedGroup, ServerHello, TLSInnerPlaintext } from "../src/dep.ts";
 import { derivedSecret } from "../src/keyschedule/keyschedule.js"
 import { Resumed } from "../src/secret/resumed.js";
 import { serverPrivateKey, serverHelloMsg, chs, shs, d_master_key, master_key, encryptedExtensionsMsg, finishedKeyServer, c_ap_traffic_key, s_ap_traffic_key, write_traffic_key, write_traffic_iv, exp_master_key } from "./data_resumed_0-RTT/server.js";
@@ -28,7 +28,7 @@ assertEquals(resumed.client_early_traffic_secret.toString(), ce_trafficKey.toStr
 assertEquals(resumed.early_exporter_master_secret.toString(), e_exp_trafficKey.toString());
 
 const data = HexaDecimal.fromString(`41 42 43 44 45 46`).byte;
-const tlsInnerPlaintext = ContentType.APPLICATION_DATA.tlsInnerPlaintext(data);
+const tlsInnerPlaintext = new TLSInnerPlaintext(data, ContentType.APPLICATION_DATA);
 const encrytped = await resumed.aeadEarlyAppClient.encrypt(tlsInnerPlaintext);
 const decrypted = await resumed.aeadEarlyAppClient.decrypt(encrytped);
 
@@ -89,7 +89,7 @@ assertEquals(resumed.expMaster.toString(), exp_master_key.toString())
 */
 
 const endOfEarlyData = new EndOfEarlyData();
-const encryptedEODD = await resumed.aeadHSClient.encrypt(endOfEarlyData.handshake.tlsInnerPlaintext())
+const encryptedEODD = await resumed.aeadHSClient.encrypt(new TLSInnerPlaintext(endOfEarlyData.record, ContentType.APPLICATION_DATA))
 const decryptedEODD = await resumed.aeadHSClient.decrypt(encryptedEODD);
 
 assertEquals(resumed.keyHSClient.toString(), keyHSClient.toString());
@@ -118,7 +118,7 @@ const data_0 = HexaDecimal.fromString(`00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d
          0f 10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f 20 21 22 23
          24 25 26 27 28 29 2a 2b 2c 2d 2e 2f 30 31`).byte;
 
-const record = ContentType.APPLICATION_DATA.tlsInnerPlaintext(data_0);
+const record = new TLSInnerPlaintext(data_0, ContentType.APPLICATION_DATA)
 const encryptedClient = await resumed.aeadAPClient.encrypt(record);
 const decryptedClient = await resumed.aeadAPClient.decrypt(encryptedClient);
 
@@ -126,7 +126,7 @@ const encryptedServer = await resumed.aeadAPServer.encrypt(record);
 const decryptedServer = await resumed.aeadAPServer.decrypt(encryptedServer);
 
 const alert = Alert.fromAlertDescription(AlertDescription.CLOSE_NOTIFY);
-const alertInnerPlaintext = ContentType.APPLICATION_DATA.tlsInnerPlaintext(alert);
+const alertInnerPlaintext = new TLSInnerPlaintext(alert,ContentType.APPLICATION_DATA);
 
 const encAlertClient = await resumed.aeadAPClient.encrypt(alertInnerPlaintext);
 const decAlertClient = await resumed.aeadAPClient.decrypt(encAlertClient);

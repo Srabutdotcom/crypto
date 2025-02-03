@@ -3,11 +3,24 @@ import { clientHello, clientPrivateKey } from "../test/data_fullhandshake/fullha
 import { serverHello, application_data } from "../test/data_fullhandshake/fullhandshake_data.js";
 import { ClientHello, Handshake, ServerHello } from "../src/dep.ts";
 import { TLSCiphertext, parseItems } from "../src/dep.ts";
+import { EncryptedExtensions, Certificate, CertificateVerify, Finished } from "../src/dep.ts";
 
 /* const test = new FullHandshake(ClientHello.fromHandshake(clientHelloMsg), ServerHello.fromHandshake(serverHelloMsg), clientPrivateKey, HandshakeRole.CLIENT); */
 
 const test = new FullHandshake(ClientHello.from(clientHello), ServerHello.from(serverHello), clientPrivateKey, HandshakeRole.CLIENT);
 
-const decrypted = await test.aead_hs_s.decrypt(TLSCiphertext.from(application_data));
+const decrypted = await test.aead_hs_s.open(TLSCiphertext.from(application_data));
 
-const handshakes = parseItems(decrypted.content, 0, decrypted.content.length, Handshake)
+const handshakes = parseItems(decrypted.content, 0, decrypted.content.length, Handshake);
+
+const [encryptedExt, certificate, certificateVerify, finished] = handshakes;
+
+//NOTE - encryptedExtension is temporarily ignored
+const encryptedExtMsg = EncryptedExtensions.from(encryptedExt.message);
+const certificateMsg = Certificate.from(certificate.message);
+const certificateVerifyMsg = CertificateVerify.from(certificateVerify.message);
+const finishedMsg = Finished.from(finished.message)
+
+const isCertificateEntriesValid = await certificateMsg.verify()
+
+debugger;

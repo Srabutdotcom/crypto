@@ -12,9 +12,12 @@ export { GCM } from "@stablelib/gcm";
 export { SHA256 } from "@stablelib/sha256";
 export { SHA384 } from "@stablelib/sha384";
 export { HMAC } from "@stablelib/hmac";
-export { siv } from "@noble/ciphers/aes";
+//export { gcm } from "@noble/ciphers/aes";
 export * from "@tls/struct"
 export * from "@tls/enum"
 export * from "@tls/keyexchange";
 export * from "@tls/extension"
-export { CertificateRequest, EncryptedExtensions } from "@tls/param"
+export { CertificateRequest, EncryptedExtensions } from "@tls/param";
+export { Certificate, CertificateEntry, CertificateVerify, Finished, Signature } from "@tls/auth";
+export * from "@tls/record";
+export * from "@tls/handshake";

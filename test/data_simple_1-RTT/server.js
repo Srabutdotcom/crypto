@@ -1,4 +1,4 @@
-import { HexaDecimal, HandshakeType } from "../../src/dep.ts"
+import { HexaDecimal, HandshakeType, Handshake } from "../../src/dep.ts"
 
 // Key- selected based on prefered curve 
 export const serverPrivateKey = HexaDecimal.fromString(
@@ -45,7 +45,7 @@ export const finishedKeyClient = HexaDecimal.fromString(
    6b f8 3f 84 82 1d 1f 87 fd c7 d3 c7 5b 5a 7b 42 d9 c4`
 ).byte
 
-export const encryptedExtensionsMsg = HandshakeType.ENCRYPTED_EXTENSIONS.handshake(HexaDecimal.fromString(`00 22 00 0a 00 14 00
+export const encryptedExtensionsMsg = new Handshake(HandshakeType.ENCRYPTED_EXTENSIONS,HexaDecimal.fromString(`00 22 00 0a 00 14 00
    12 00 1d 00 17 00 18 00 19 01 00 01 01 01 02 01 03 01 04 00 1c
    00 02 40 01 00 00 00 00
 `).byte).byte
