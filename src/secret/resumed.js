@@ -216,5 +216,5 @@ function addBinders(binders, clientHelloMsg) {
    // add to clientHelloMsg;
    const clientHelloMsg_0 = ClientHello.fromHandShake(clientHelloMsg);
    const clientHelloMsg_1  = clientHelloMsg_0.addBinders(binders);
-   return clientHelloMsg_1.toRecord();
+   return clientHelloMsg_1.record;
 }

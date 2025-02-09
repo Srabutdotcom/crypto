@@ -1,7 +1,7 @@
 import { hkdfExtract256, hkdfExtract384 } from "../hkdf/hkdf.js";
 import { derivedSecret, DerivedSecret, hkdfExpandLabel } from "../keyschedule/keyschedule.js";
 import { TranscriptMsg } from "./transcript.js";
-import { Enum } from "../dep.ts";
+import { ClientHello, Enum, ExtensionType, NamedGroup, parseItems, TLSPlaintext, Handshake, TLSCiphertext } from "../dep.ts";
 import { Aead } from "../aead/aead.js";
 
 export class HandshakeRole extends Enum {
@@ -11,12 +11,12 @@ export class HandshakeRole extends Enum {
 
 export class FullHandshake {
    transcript = new TranscriptMsg;
-   constructor(clientHello, serverHello, privateKey, role = HandshakeRole.CLIENT, _compare) {
+   constructor(clientHelloHandshake, serverHelloHandshake, privateKey, role = HandshakeRole.CLIENT, _compare) {
       //TODO - validate arguments
-      this.clientHello = clientHello;
-      this.serverHello = serverHello;
-      this.transcript.insert(clientHello.handshake, serverHello.handshake);
-      this.cipher = serverHello.cipher_suite;
+      this.clientHello = clientHelloHandshake.message;
+      this.serverHello = serverHelloHandshake.message;
+      this.transcript.insert(clientHelloHandshake, serverHelloHandshake);
+      this.cipher = this.serverHello.cipher;
       switch (this.cipher.hashLength) {
          case 32: {
             this.derivedKey = DerivedSecret.SHA256;
@@ -29,7 +29,7 @@ export class FullHandshake {
             break
          }
       }
-      this.namedGroup = serverHello.ext['KEY_SHARE'].group;
+      this.namedGroup = this.serverHello.extensions.get(ExtensionType.KEY_SHARE).group;
       this.role = role;
       this.privateKey = privateKey;
 
@@ -52,10 +52,23 @@ export class FullHandshake {
       this.masterKey = this.hkdfExtract(derivedMaster)
    }
    get peerKey() {
-      if (this.role == HandshakeRole.CLIENT) return this.serverHello.ext.KEY_SHARE.key_exchange;
+      if (this.role == HandshakeRole.CLIENT) return this.serverHello.extensions.get(ExtensionType.KEY_SHARE).key_exchange;
       return this.clientHello.ext.get("KEY_SHARE").data.keyShareEntries.get(this.namedGroup)
    }
    get sharedSecret(){
       return this.namedGroup.keyGen.getSharedSecret(this.privateKey, this.peerKey)
    }
+}
+
+export function parseRecords(array) {
+   return parseItems(array, 0, array.length, TLSPlaintext)//new Set
+}
+
+export async function parseServerHello(array, clientHello, clientPrivateKey) {
+   if ((clientHello instanceof ClientHello) == false) clientHello = ClientHello.from(clientHello);
+   const [serverHelloRecord, _changeCipherSpec, applicationData] = parseRecords(array);
+   const fullHS = new FullHandshake(Handshake.fromClientHello(clientHello), serverHelloRecord.fragment, clientPrivateKey, HandshakeRole.CLIENT);
+   const decrypted = await fullHS.aead_hs_s.decrypt(TLSCiphertext.from(applicationData))
+   const [encryptedExt, certificate, certificateVerify, finished] = parseItems(decrypted.content, 0, decrypted.content.length, Handshake)
+   return true;
 }

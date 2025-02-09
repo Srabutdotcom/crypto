@@ -7,7 +7,6 @@ import { GCM } from "../dep.ts"
 //const crypto = new Crypto();
 
 export class Aead { //*AESGCM
-
    /**
     * @type {number} sequential number - positive integer
     */
@@ -61,24 +60,25 @@ export class Aead { //*AESGCM
     * @param {TLSInnerPlaintext} tlsInnerPlaintext - data to be encrypted in Uint8Array
     * @returns {TLSCiphertext}
     */
-   async encrypt(tlsInnerPlaintext) {
-      const _header = header(tlsInnerPlaintext, this.key.length);
+   async encrypt(content, type, numZeros) {
+      const tlsInnerPlaintext = TLSInnerPlaintext.fromContentTypeNumZeros(content, type, numZeros)
       await this.importKey();
       const output = await crypto.subtle.encrypt({
          name: "AES-GCM",
          iv: this.ivEnc,
-         additionalData: _header, // as additional data
+         additionalData: tlsInnerPlaintext.header(this.keyLength), // as additional data
          //tagLength: 128 //*by default is 128
       }, this.cryptoKey, tlsInnerPlaintext);
       this.buildIVEnc()
-      return new TLSCiphertext(new Uint8Array(output));
+      return TLSCiphertext.from(new Uint8Array(output));
    }
    /**
     * 
-    * @param {tlsCipherText} tlsCipherText 
+    * @param {TLSCiphertext} tlsCipherText 
     * @returns 
     */
    async decrypt(tlsCipherText) {
+      tlsCipherText = (tlsCipherText instanceof TLSCiphertext)? tlsCipherText : TLSCiphertext.from(tlsCipherText)
       await this.importKey();
       const output = await crypto.subtle.decrypt({
          name: "AES-GCM",
@@ -90,23 +90,18 @@ export class Aead { //*AESGCM
       return TLSInnerPlaintext.from(new Uint8Array(output));
    }
 
-   seal(tlsInnerPlaintext){
-      const _header = header(tlsInnerPlaintext, this.key.length);
-      const sealed = this.gcm.seal(this.ivEnc, tlsInnerPlaintext, _header);
+   seal(content, type, numZeros){
+      const tlsInnerPlaintext = TLSInnerPlaintext.fromContentTypeNumZeros(content, type, numZeros)
+      const sealed = this.gcm.seal(this.ivEnc, tlsInnerPlaintext, tlsInnerPlaintext.header(this.keyLength));
       this.buildIVEnc();
       return new TLSCiphertext(sealed);
    }
 
    open(tlsCipherText){
+      tlsCipherText = (tlsCipherText instanceof TLSCiphertext)? tlsCipherText : TLSCiphertext.from(tlsCipherText)
       const opened = this.gcm.open(this.ivDec, tlsCipherText.encrypted_record, tlsCipherText.header);
       this.buildIVDec();
       return TLSInnerPlaintext.from(opened);
    }
 
-}
-
-function header(tlsInnerPlaintext, keyLength){
-   const lengthOf = tlsInnerPlaintext.length + keyLength;
-   // header always 23 - application
-   return Uint8Array.of(23, 3, 3, Math.trunc(lengthOf / 256), lengthOf % 256);
 }
