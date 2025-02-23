@@ -1,8 +1,10 @@
 import { hkdfExtract256, hkdfExtract384 } from "../hkdf/hkdf.js";
 import { derivedSecret, DerivedSecret, hkdfExpandLabel } from "../keyschedule/keyschedule.js";
 import { TranscriptMsg } from "./transcript.js";
-import { ClientHello, Enum, ExtensionType, NamedGroup, parseItems, TLSPlaintext, Handshake, TLSCiphertext } from "../dep.ts";
+import { ClientHello, Enum, ExtensionType, parseItems, TLSPlaintext, Handshake } from "../dep.ts";
+import { verifyCertificateVerify } from "../dep.ts"
 import { Aead } from "../aead/aead.js";
+import { finished } from "../dep.ts";
 
 export class HandshakeRole extends Enum {
    static CLIENT = new HandshakeRole('CLIENT', 'CLIENT');
@@ -29,7 +31,7 @@ export class FullHandshake {
             break
          }
       }
-      this.namedGroup = this.serverHello.extensions.get(ExtensionType.KEY_SHARE).group;
+      this.namedGroup = this.serverHello.extensions.get(ExtensionType.KEY_SHARE).data.group;
       this.role = role;
       this.privateKey = privateKey;
 
@@ -52,7 +54,7 @@ export class FullHandshake {
       this.masterKey = this.hkdfExtract(derivedMaster)
    }
    get peerKey() {
-      if (this.role == HandshakeRole.CLIENT) return this.serverHello.extensions.get(ExtensionType.KEY_SHARE).key_exchange;
+      if (this.role == HandshakeRole.CLIENT) return this.serverHello.extensions.get(ExtensionType.KEY_SHARE).data.key_exchange;
       return this.clientHello.ext.get("KEY_SHARE").data.keyShareEntries.get(this.namedGroup)
    }
    get sharedSecret(){
@@ -68,7 +70,24 @@ export async function parseServerHello(array, clientHello, clientPrivateKey) {
    if ((clientHello instanceof ClientHello) == false) clientHello = ClientHello.from(clientHello);
    const [serverHelloRecord, _changeCipherSpec, applicationData] = parseRecords(array);
    const fullHS = new FullHandshake(Handshake.fromClientHello(clientHello), serverHelloRecord.fragment, clientPrivateKey, HandshakeRole.CLIENT);
-   const decrypted = await fullHS.aead_hs_s.decrypt(TLSCiphertext.from(applicationData))
-   const [encryptedExt, certificate, certificateVerify, finished] = parseItems(decrypted.content, 0, decrypted.content.length, Handshake)
+   const decrypted = await fullHS.aead_hs_s.decrypt(applicationData)
+   const [encryptedExtsMsg, certificateMsg, certificateVerifyMsg, finishedMsg] = parseItems(decrypted.content, 0, decrypted.content.length, Handshake)
+   const _isCertificateValid = await certificateMsg.message.verify();
+   const _isCertificateVerifyValid = await verifyCertificateVerify(
+      Handshake.fromClientHello(clientHello),
+      serverHelloRecord.fragment,
+      encryptedExtsMsg,
+      certificateMsg,
+      certificateVerifyMsg
+   )
+   const expectedFinished = await finished(
+      fullHS.finished_key_s, fullHS.cipher.hashLength*8, 
+      Handshake.fromClientHello(clientHello),
+      serverHelloRecord.fragment,
+      encryptedExtsMsg,
+      certificateMsg,
+      certificateVerifyMsg
+   )
+   const _isFinishedValid = expectedFinished.toString() == finishedMsg.message.toString() 
    return true;
 }

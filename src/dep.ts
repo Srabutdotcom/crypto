@@ -15,9 +15,9 @@ export { HMAC } from "@stablelib/hmac";
 //export { gcm } from "@noble/ciphers/aes";
 export * from "@tls/struct"
 export * from "@tls/enum"
-export * from "@tls/keyexchange";
+export { ClientHello, ServerHello } from "@tls/keyexchange";
 export * from "@tls/extension"
-export { CertificateRequest, EncryptedExtensions } from "@tls/param";
-export { Certificate, CertificateEntry, CertificateVerify, Finished, Signature } from "@tls/auth";
+export * from "@tls/param";
+export * from "@tls/auth";
 export * from "@tls/record";
 export * from "@tls/handshake";

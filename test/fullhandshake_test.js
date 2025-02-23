@@ -11,18 +11,18 @@ import { parseServerHello } from "../src/secret/fullhandshake.js";
 //const test = new FullHandshake(Handshake.fromClientHello(clientHello), Handshake.fromServerHello(serverHello), clientPrivateKey, HandshakeRole.CLIENT);
 const test_0 = await parseServerHello(response, clientHello, clientPrivateKey )
 
-const decrypted = await test.aead_hs_s.open(TLSCiphertext.from(application_data));
+//const decrypted = await test.aead_hs_s.open(application_data);
 
-const handshakes = parseItems(decrypted.content, 0, decrypted.content.length, Handshake);
+//const handshakes = parseItems(decrypted.content, 0, decrypted.content.length, Handshake);
 
-const [encryptedExt, certificate, certificateVerify, finished] = handshakes;
+//const [encryptedExt, certificate, certificateVerify, finished] = handshakes;
 
 //NOTE - encryptedExtension is temporarily ignored
-const encryptedExtMsg = EncryptedExtensions.from(encryptedExt.message);
+/* const encryptedExtMsg = EncryptedExtensions.from(encryptedExt.message);
 const certificateMsg = Certificate.from(certificate.message);
 const certificateVerifyMsg = CertificateVerify.from(certificateVerify.message);
 const finishedMsg = Finished.from(finished.message)
 
-const isCertificateEntriesValid = await certificateMsg.verify()
+const isCertificateEntriesValid = await certificateMsg.verify() */
 
 debugger;
