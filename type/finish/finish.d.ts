@@ -11,4 +11,4 @@ declare function finished(
    finish_key: Uint8Array,
    message: Uint8Array,
    sha: 256 | 384
- ): Finished;
+ ): Promise<Uint8Array>;

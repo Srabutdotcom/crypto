@@ -6,7 +6,7 @@ import { TranscriptMsg } from "../../src/secret/transcript.js";
 /**
  * Represents a full TLS 1.3 handshake implementation.
  */
-export class FullHandshake {
+export class HandshakeKey {
    /**
     * The transcript of handshake messages.
     */
@@ -78,7 +78,7 @@ export class FullHandshake {
    masterKey: Uint8Array;
  
    /**
-    * Constructs a FullHandshake instance.
+    * Constructs a HandshakeKey instance.
     * 
     * @param clientHello - The ClientHello message.
     * @param serverHello - The ServerHello message.

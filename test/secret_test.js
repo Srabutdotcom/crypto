@@ -8,13 +8,13 @@ import { expMasterKey, keyAPServer, ivAPServer, keyHSClient, ivHSClient } from "
 import { keyAPClient, ivAPClient, finishedKeyClient, resMaster, resumption } from "./data_simple_1-RTT/server.js";
 import { newSessionTicket } from "./data_simple_1-RTT/server.js";
 import { assertEquals } from "jsr:@std/assert"
-import { FullHandshake, HandshakeRole } from "../src/secret/fullhandshake.js";
+import { HandshakeKey, HandshakeRole } from "../src/secret/fullhandshake.js";
 import { ClientHello, ServerHello } from "../src/dep.ts";
 
 const secret = new Secret(Cipher.AES_128_GCM_SHA256, NamedGroup.X25519, serverPrivateKey, serverPublicKey, clientPublicKey);
 //update handshake key
 await secret.updateHSKey(clientHelloMsg, serverHelloMsg);
-const fullHS = new FullHandshake(ClientHello.fromHandshake(clientHelloMsg), ServerHello.fromHandshake(serverHelloMsg), serverPrivateKey, HandshakeRole.SERVER, secret )
+const fullHS = new HandshakeKey(ClientHello.fromHandshake(clientHelloMsg), ServerHello.fromHandshake(serverHelloMsg), serverPrivateKey, HandshakeRole.SERVER, secret )
 
 const readBack = await secret.aeadHSServer.decrypt(TLSCiphertext.from(completeRecord)); 
 const readBack_0 = await fullHS.aead_hs_s.decrypt(TLSCiphertext.from(completeRecord));debugger;

@@ -64,7 +64,23 @@ export function finish_stablelib(finish_key, message, sha = 256) {
 
 //NOTE finish_noble is the fastest
 
-export function finished(finish_key, message, sha){
-   const finish = finish_noble(finish_key, message, sha);
-   return new Finished(finish);
+export async function finished(finish_key, message, sha){
+   const funcs = [ finish_noble, finish_stablelib, finish_web ];
+   let lastError;
+   for (const func of funcs){
+      try {
+         return await tries(func, finish_key, message, sha)
+      } catch (error) {
+         lastError = error;
+      }
+   }
+   throw lastError
+}
+
+async function tries(func, ...args){
+   try {
+      return await func(...args);
+   } catch (error) {
+      throw error
+   }
 }
