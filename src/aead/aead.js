@@ -1,6 +1,8 @@
 //@ts-self-types="../../type/aead/aead.d.ts"
-import { TLSCiphertext,/* , Crypto */ 
-TLSInnerPlaintext} from "../dep.ts"
+import {
+   TLSCiphertext,/* , Crypto */
+   TLSInnerPlaintext
+} from "../dep.ts"
 import { AES } from "../dep.ts"
 import { GCM } from "../dep.ts"
 
@@ -66,11 +68,11 @@ export class Aead { //*AESGCM
       const output = await crypto.subtle.encrypt({
          name: "AES-GCM",
          iv: this.ivEnc,
-         additionalData: tlsInnerPlaintext.header(this.keyLength), // as additional data
+         additionalData: tlsInnerPlaintext.header(this.key.length), // as additional data
          //tagLength: 128 //*by default is 128
       }, this.cryptoKey, tlsInnerPlaintext);
       this.buildIVEnc()
-      return TLSCiphertext.from(new Uint8Array(output));
+      return TLSCiphertext.from(output);
    }
    /**
     * 
@@ -78,27 +80,27 @@ export class Aead { //*AESGCM
     * @returns 
     */
    async decrypt(tlsCipherText) {
-      tlsCipherText = (tlsCipherText instanceof TLSCiphertext)? tlsCipherText : TLSCiphertext.from(tlsCipherText)
+      //tlsCipherText = (tlsCipherText instanceof TLSCiphertext)? tlsCipherText : TLSCiphertext.from(tlsCipherText)
       await this.importKey();
       const output = await crypto.subtle.decrypt({
          name: "AES-GCM",
          iv: this.ivDec,
-         additionalData: tlsCipherText.header, // as additional data
+         additionalData: tlsCipherText.subarray(0, 5), // as additional data
          //tagLength: 128 //*by default is 128
-      }, this.cryptoKey, tlsCipherText.encrypted_record);
+      }, this.cryptoKey, tlsCipherText.subarray(5)); // encrypted_record
       this.buildIVDec()
       return TLSInnerPlaintext.from(new Uint8Array(output));
    }
 
-   seal(content, type, numZeros){
+   seal(content, type, numZeros) {
       const tlsInnerPlaintext = TLSInnerPlaintext.fromContentTypeNumZeros(content, type, numZeros)
-      const sealed = this.gcm.seal(this.ivEnc, tlsInnerPlaintext, tlsInnerPlaintext.header(this.keyLength));
+      const sealed = this.gcm.seal(this.ivEnc, tlsInnerPlaintext, tlsInnerPlaintext.header(this.key.length));
       this.buildIVEnc();
       return new TLSCiphertext(sealed);
    }
 
-   open(tlsCipherText){
-      tlsCipherText = (tlsCipherText instanceof TLSCiphertext)? tlsCipherText : TLSCiphertext.from(tlsCipherText)
+   open(tlsCipherText) {
+      tlsCipherText = (tlsCipherText instanceof TLSCiphertext) ? tlsCipherText : TLSCiphertext.from(tlsCipherText)
       const opened = this.gcm.open(this.ivDec, tlsCipherText.encrypted_record, tlsCipherText.header);
       this.buildIVDec();
       return TLSInnerPlaintext.from(opened);

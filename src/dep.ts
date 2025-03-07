@@ -8,6 +8,8 @@ export { p256 } from '@noble/curves/p256';
 export { p384 } from '@noble/curves/p384';
 export { p521 } from '@noble/curves/p521';
 export { AES } from "@stablelib/aes";
+export { ChaCha20Poly1305 } from "@stablelib/chacha20poly1305";
+export { sharedKey as sharedKeyX25519 } from "@stablelib/x25519";
 export { GCM } from "@stablelib/gcm";
 export { SHA256 } from "@stablelib/sha256";
 export { SHA384 } from "@stablelib/sha384";

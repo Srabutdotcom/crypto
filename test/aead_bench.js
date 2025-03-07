@@ -1,4 +1,4 @@
-import { HexaDecimal } from "../src/dep.ts";
+import { ChaCha20Poly1305, HexaDecimal } from "../src/dep.ts";
 import { AES } from "@stablelib/aes";
 import { GCM } from "@stablelib/gcm"
 import { gcm } from "@noble/ciphers/aes"
@@ -70,5 +70,11 @@ const open = gcm_.open(nonce.byte, result.byte, ad.byte)
 
 const cipherText = gcm(key.byte, ad.byte).encrypt(plaintext.byte);
 const plainText = gcm(key.byte, ad.byte).decrypt(cipherText);
+
+const cipherChacha20 = new ChaCha20Poly1305(key.byte);
+//const gcmChacha20 = new GCM(cipherChacha20);
+
+const sealedChacha20 = cipherChacha20.seal(nonce.byte, plaintext.byte, ad.byte);
+const openChacha20 = cipherChacha20.open(nonce.byte, sealedChacha20, ad.byte)
 
 const n = null;
