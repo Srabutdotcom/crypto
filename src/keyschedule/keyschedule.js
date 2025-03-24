@@ -2,10 +2,10 @@
 import { hkdf, Uint16 } from "../dep.ts";
 import { Struct, Constrained, sha256, sha384 } from "../dep.ts";
 
-export function derivedSecret(secret, label, messages = new Uint8Array) {
-   const hashByteLength = secret.length;
+export function derivedSecret(secret, label, messages = new Uint8Array, hashLength) {
+   //const hashByteLength = secret.length;
    let hash = undefined
-   switch (hashByteLength) {
+   switch (hashLength) {
       case 32: hash = sha256; break;
       case 48: hash = sha384; break;
    }
@@ -13,13 +13,13 @@ export function derivedSecret(secret, label, messages = new Uint8Array) {
       .create()
       .update(Uint8Array.from(messages))
       .digest()
-   return hkdfExpandLabel(secret, label, context, hashByteLength)
+   return hkdfExpandLabel(secret, label, context, hashLength)
 }
 
 export function hkdfExpandLabel(secret, label, context, Length) {
    switch (secret.length) {
-      case 32: return hkdf.expand(sha256, secret, Uint8Array.from(HkdfLabel.of(Length ?? 32, label, context)), Length ?? 32)
-      case 48: return hkdf.expand(sha384, secret, Uint8Array.from(HkdfLabel.of(Length ?? 32, label, context)), Length ?? 32)
+      case 32: return hkdf.expand(sha256, secret, Uint8Array.from(HkdfLabel.of(Length, label, context)), Length)
+      case 48: return hkdf.expand(sha384, secret, Uint8Array.from(HkdfLabel.of(Length, label, context)), Length)
    }
 }
 
@@ -50,7 +50,7 @@ class Context extends Constrained {
 
 export class DerivedSecret {
    static SHA256 = Uint8Array.of(111, 38, 21, 161, 8, 199, 2, 197, 103, 143, 84, 252, 157, 186, 182, 151, 22, 192, 118, 24, 156, 72, 37, 12, 235, 234, 195, 87, 108, 54, 17, 186);
-   static SHA384 = Uint8Array.of(115, 123, 52, 69, 75, 237, 139, 131, 80, 43, 54, 16, 80, 167, 99, 154, 146, 146, 198, 59, 140, 7, 137, 209, 122, 146, 113, 108, 234, 67, 141, 183, 30, 88, 208, 165, 51, 240, 17, 149, 152, 60, 244, 110, 133, 34, 78, 95);
+   static SHA384 = Uint8Array.of(21,145,218,197,203,191,3,48,164,168,77,233,199,83,51,14,146,208,31,10,136,33,75,68,100,151,47,214,104,4,158,147,229,47,43,22,250,217,34,253,192,88,68,120,66,143,40,43);
 }
 
 export function finishedKey(serverHS_secret, hashLength) {

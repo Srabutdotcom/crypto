@@ -1,6 +1,6 @@
 {
   "name": "@tls/crypto",
-  "version": "0.3.8",
+  "version": "0.3.9",
   "exports": "./src/mod.ts",
   "publish": {
     "exclude": ["dist/"]
@@ -25,14 +25,16 @@
     "@stablelib/sha384": "npm:@stablelib/sha384@^2.0.1",
     "@stablelib/x25519": "npm:@stablelib/x25519@^2.0.1",
     "@std/assert": "jsr:@std/assert@^1.0.2",
-    "@tls/auth": "jsr:@tls/auth@^0.1.6",
-    "@tls/enum": "jsr:@tls/enum@^0.8.7",
-    "@tls/extension": "jsr:@tls/extension@^0.4.6",
-    "@tls/handshake": "jsr:@tls/handshake@^0.1.2",
-    "@tls/keyexchange": "jsr:@tls/keyexchange@^0.3.9",
-    "@tls/param": "jsr:@tls/param@^0.2.5",
-    "@tls/record": "jsr:@tls/record@^0.2.1",
+    "@tls/auth": "jsr:@tls/auth@^0.2.3",
+    "@tls/enum": "jsr:@tls/enum@^0.9.0",
+    "@tls/extension": "jsr:@tls/extension@^0.4.7",
+    "@tls/handshake": "jsr:@tls/handshake@^0.1.5",
+    "@tls/keyexchange": "jsr:@tls/keyexchange@^0.4.5",
+    "@tls/param": "jsr:@tls/param@^0.2.6",
+    "@tls/record": "jsr:@tls/record@^0.2.4",
     "@tls/struct": "jsr:@tls/struct@^0.3.8",
+    "asn1.js": "npm:asn1.js@^5.4.1",
+    "ec-key": "npm:ec-key@^0.0.6",
     "elliptic": "npm:elliptic@^6.6.1"
   }
 }

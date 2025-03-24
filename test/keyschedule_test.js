@@ -15,15 +15,17 @@ Deno.test("derived secret", ()=>{
       32
    )
    
-   const derived = derivedSecret(EarlySecret.SHA256, 'derived')
+   const derived = derivedSecret(EarlySecret.SHA256, 'derived', new Uint8Array(), 32)
    assertEquals(test.toString(), derived.toString())
 })
 
-const derived_secret256_original = derivedSecret(EarlySecret.SHA256, 'derived');
+const derived_secret256_original = derivedSecret(EarlySecret.SHA256, 'derived', new Uint8Array, 32);
 const derived_secret256_default = Uint8Array.of(111,38,21,161,8,199,2,197,103,143,84,252,157,186,182,151,22,192,118,24,156,72,37,12,235,234,195,87,108,54,17,186)
 
-const derived_secret384_original = derivedSecret(EarlySecret.SHA384, 'derived');
-const derived_secret384_default = Uint8Array.of(115,123,52,69,75,237,139,131,80,43,54,16,80,167,99,154,146,146,198,59,140,7,137,209,122,146,113,108,234,67,141,183,30,88,208,165,51,240,17,149,152,60,244,110,133,34,78,95)
+const derived_secret384_original = derivedSecret(EarlySecret.SHA384, 'derived', new Uint8Array, 48);
+const derived_secret384_default = Uint8Array.of(21,145,218,197,203,191,3,48,164,168,77,233,199,83,51,14,146,208,31,10,136,33,75,68,100,151,47,214,104,4,158,147,229,47,43,22,250,217,34,253,192,88,68,120,66,143,40,43)
+
+const _null = null
 
 
 

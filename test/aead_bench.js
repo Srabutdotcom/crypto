@@ -61,6 +61,12 @@ Deno.bench("AES-GCM using webcrypto", async () => {
    const b = new Uint8Array(open_web)
 })
 
+/* 
+benchmark                 time/iter (avg)        iter/s      (min … max)           p75      p99     p995
+------------------------- ----------------------------- --------------------- --------------------------
+AES-GCM using stablelib          127.1 µs         7,869 (109.4 µs … 769.2 µs) 130.3 µs 198.8 µs 216.4 µs
+AES-GCM using webcrypto          181.3 µs         5,517 (142.8 µs …   1.2 ms) 179.2 µs 312.4 µs 330.9 µs */
+
 
 const cipher = new AES(key.byte)
 const gcm_ = new GCM(cipher);

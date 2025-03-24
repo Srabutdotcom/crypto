@@ -45,13 +45,15 @@ export const finishedKeyClient = HexaDecimal.fromString(
    6b f8 3f 84 82 1d 1f 87 fd c7 d3 c7 5b 5a 7b 42 d9 c4`
 ).byte
 
-export const encryptedExtensionsMsg = new Handshake(HandshakeType.ENCRYPTED_EXTENSIONS,HexaDecimal.fromString(`00 22 00 0a 00 14 00
-   12 00 1d 00 17 00 18 00 19 01 00 01 01 01 02 01 03 01 04 00 1c
-   00 02 40 01 00 00 00 00
-`).byte).byte
+export const encryptedExtensionsMsg = Handshake.fromEncryptedExtension(
+   HexaDecimal.fromString(`00 22 00 0a 00 14 00
+      12 00 1d 00 17 00 18 00 19 01 00 01 01 01 02 01 03 01 04 00 1c
+      00 02 40 01 00 00 00 00
+   `).byte
+)
 
 export const certificateMsg = HexaDecimal.fromString(
-`0b 00 01 b9 00 00 01 b5 00 01 b0 30 82
+   `0b 00 01 b9 00 00 01 b5 00 01 b0 30 82
 01 ac 30 82 01 15 a0 03 02 01 02 02 01 02 30 0d 06 09 2a 86 48
 86 f7 0d 01 01 0b 05 00 30 0e 31 0c 30 0a 06 03 55 04 03 13 03
 72 73 61 30 1e 17 0d 31 36 30 37 33 30 30 31 32 33 35 39 5a 17
@@ -128,6 +130,13 @@ export const finishedClientMsg = HexaDecimal.fromString(
    c1 fc eb e1 1a 03 9e c1 76 94 fa c6 e9 85 27 b6 42 f2 ed d5 ce
    61`).byte
 
+export const finishedClientEncrypted = HexaDecimal.fromString(
+   `17 03 03 00 35 75 ec 4d c2 38 cc e6
+   0b 29 80 44 a7 1e 21 9c 56 cc 77 b0 51 7f e9 b9 3c 7a 4b fc 44
+   d8 7f 38 f8 03 38 ac 98 fc 46 de b3 84 bd 1c ae ac ab 68 67 d7
+   26 c4 05 46`
+).byte
+
 export const resumption = HexaDecimal.fromString(
    `4e cd 0e b6 ec 3b 4d 87 f5 d6 02 8f 92 2c
    a4 c5 85 1a 27 7f d4 13 11 c9 e6 2d 2c 94 92 e1 c4 f3`
@@ -146,6 +155,21 @@ export const newSessionTicket = HexaDecimal.fromString(
    5e 5b fb c3 88 e9 33 43 69 40 93 93 4a e4 d3 57 00 08 00 2a 00
    04 00 00 04 00`
 ).byte;
+
+export const newSessionTicketRecord = HexaDecimal.fromString(
+   `17 03 03 00 de 3a 6b 8f 90 41 4a 97
+   d6 95 9c 34 87 68 0d e5 13 4a 2b 24 0e 6c ff ac 11 6e 95 d4 1d
+   6a f8 f6 b5 80 dc f3 d1 1d 63 c7 58 db 28 9a 01 59 40 25 2f 55
+   71 3e 06 1d c1 3e 07 88 91 a3 8e fb cf 57 53 ad 8e f1 70 ad 3c
+   73 53 d1 6d 9d a7 73 b9 ca 7f 2b 9f a1 b6 c0 d4 a3 d0 3f 75 e0
+   9c 30 ba 1e 62 97 2a c4 6f 75 f7 b9 81 be 63 43 9b 29 99 ce 13
+   06 46 15 13 98 91 d5 e4 c5 b4 06 f1 6e 3f c1 81 a7 7c a4 75 84
+   00 25 db 2f 0a 77 f8 1b 5a b0 5b 94 c0 13 46 75 5f 69 23 2c 86
+   51 9d 86 cb ee ac 87 aa c3 47 d1 43 f9 60 5d 64 f6 50 db 4d 02
+   3e 70 e9 52 ca 49 fe 51 37 12 1c 74 bc 26 97 68 7e 24 87 46 d6
+   df 35 30 05 f3 bc e1 86 96 12 9c 81 53 55 6b 3b 6c 67 79 b3 7b
+   f1 59 85 68 4f
+   `).byte;
 
 export const data = HexaDecimal.fromString(
    `00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e
